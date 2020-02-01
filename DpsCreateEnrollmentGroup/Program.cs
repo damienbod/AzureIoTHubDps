@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Provisioning.Service;
@@ -32,6 +33,7 @@ namespace DpsCreateEnrollmentGroup
                 Console.WriteLine("\nCreating a new enrollmentGroup...");
                 var certificate = new X509Certificate2(X509RootCertPath);
 
+
                 Attestation attestation = X509Attestation.CreateFromRootCertificates(certificate);
                 EnrollmentGroup enrollmentGroup =
                         new EnrollmentGroup(
@@ -43,6 +45,17 @@ namespace DpsCreateEnrollmentGroup
                 Console.WriteLine(enrollmentGroup);
                 #endregion
 
+
+                enrollmentGroup.ReprovisionPolicy = new ReprovisionPolicy();
+                enrollmentGroup.ReprovisionPolicy.MigrateDeviceData = false;
+                enrollmentGroup.ReprovisionPolicy.UpdateHubAssignment = true;
+
+                var timeZoneItem = TimeZoneInfo.Local;
+
+                enrollmentGroup.InitialTwinState = new TwinState(
+                   new Microsoft.Azure.Devices.Shared.TwinCollection("{ \"updatedby\":\"" + "damien" + "\", \"timeZone\":\"" + timeZoneItem.DisplayName + "\" }"),
+                   new Microsoft.Azure.Devices.Shared.TwinCollection("{}")
+               );
                 #region Create the enrollmentGroup
                 Console.WriteLine("\nAdding new enrollmentGroup...");
                 EnrollmentGroup enrollmentGroupResult =

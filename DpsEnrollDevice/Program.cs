@@ -57,8 +57,6 @@ namespace DpsEnrollDevice
             // using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.TcpOnly))
             // using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.WebSocketOnly))
             {
-
-
                 var client = ProvisioningDeviceClient.Create(
                     "global.azure-devices-provisioning.net", scopeId, security, transport);
 
