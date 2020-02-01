@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertsCreateDeviceCertificat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertsVerifyCertificate", "CertsVerifyCertificate\CertsVerifyCertificate.csproj", "{313CC306-90D0-454E-8BFB-2D92ADB3695D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DpsCreateIndividualEnrollment", "DpsCreateIndividualEnrollment\DpsCreateIndividualEnrollment.csproj", "{F9FA622B-F7FF-40C2-866A-F117DD8DF478}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{313CC306-90D0-454E-8BFB-2D92ADB3695D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{313CC306-90D0-454E-8BFB-2D92ADB3695D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{313CC306-90D0-454E-8BFB-2D92ADB3695D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9FA622B-F7FF-40C2-866A-F117DD8DF478}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9FA622B-F7FF-40C2-866A-F117DD8DF478}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9FA622B-F7FF-40C2-866A-F117DD8DF478}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9FA622B-F7FF-40C2-866A-F117DD8DF478}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
