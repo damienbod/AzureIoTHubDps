@@ -28,6 +28,7 @@ namespace DpsManagement
             if (groupEnrollment.ProvisioningStatus.Value != ProvisioningStatus.Disabled)
             {
                 groupEnrollment.ProvisioningStatus = ProvisioningStatus.Disabled;
+                var update = await _provisioningServiceClient.CreateOrUpdateEnrollmentGroupAsync(groupEnrollment);
             }
         }
 
@@ -44,6 +45,7 @@ namespace DpsManagement
                     if (enrollment.ProvisioningStatus.Value != ProvisioningStatus.Enabled)
                     {
                         enrollment.ProvisioningStatus = ProvisioningStatus.Enabled;
+                        var update = await _provisioningServiceClient.CreateOrUpdateEnrollmentGroupAsync(enrollment);
                     }
                 }
             }
