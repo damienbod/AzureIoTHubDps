@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Devices;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace DpsManagement
@@ -9,9 +10,12 @@ namespace DpsManagement
         private readonly RegistryManager _registryManager;
         private IConfiguration Configuration { get; set; }
 
-        public IoTHubUpdateDevice(IConfiguration config)
+        private readonly ILogger<IoTHubUpdateDevice> _logger;
+   
+        public IoTHubUpdateDevice(IConfiguration config, ILoggerFactory loggerFactory)
         {
             Configuration = config;
+            _logger = loggerFactory.CreateLogger<IoTHubUpdateDevice>();
             _registryManager = RegistryManager.CreateFromConnectionString(
                 Configuration.GetConnectionString("IoTHubConnection"));
         }
@@ -21,6 +25,7 @@ namespace DpsManagement
             var device = await _registryManager.GetDeviceAsync(deviceId);
             device.Status = DeviceStatus.Disabled;
             device = await _registryManager.UpdateDeviceAsync(device);
+            _logger.LogInformation($"iot hub device disabled  {device}");
         }
 
         public async Task EnableDeviceAsync(string deviceId)
@@ -28,6 +33,7 @@ namespace DpsManagement
             var device = await _registryManager.GetDeviceAsync(deviceId);
             device.Status = DeviceStatus.Enabled;
             device = await _registryManager.UpdateDeviceAsync(device);
+            _logger.LogInformation($"iot hub device enabled  {device}");
         }
 
         //public async Task quuu(string deviceId)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace DpsManagement
 {
@@ -7,10 +8,16 @@ namespace DpsManagement
     {
         private readonly ProvisioningServiceClient _provisioningServiceClient;
 
-        public DpsUpdateDevice(
-          IConfiguration configuration)
+        private IConfiguration Configuration { get; set; }
+        private readonly ILogger<DpsUpdateDevice> _logger;
+
+        public DpsUpdateDevice(IConfiguration config, ILoggerFactory loggerFactory)
         {
-            _provisioningServiceClient = ProvisioningServiceClient.CreateFromConnectionString(configuration.GetConnectionString("DpsConnection"));
+            Configuration = config;
+            _logger = loggerFactory.CreateLogger<DpsUpdateDevice>();
+
+            _provisioningServiceClient = ProvisioningServiceClient
+                .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
         }
 
 
