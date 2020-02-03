@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -13,22 +14,25 @@ namespace DpsManagement
     {
         private IConfiguration Configuration { get;set;}
 
-        public DpsEnrollmentGroup(IConfiguration config)
+        private readonly ILogger<DpsEnrollmentGroup> _logger;
+
+        public DpsEnrollmentGroup(IConfiguration config, ILoggerFactory loggerFactory)
         {
             Configuration = config;
+            _logger = loggerFactory.CreateLogger<DpsEnrollmentGroup>();
         }
         
         public async Task CreateDpsEnrollmentGroupAsync(
             string enrollmentGroupId, 
             X509Certificate2 pemCertificate)
         {
-            Console.WriteLine("Starting CreateDpsEnrollmentGroupAsync...");
+            _logger.LogInformation("Starting CreateDpsEnrollmentGroupAsync...");
 
             using (ProvisioningServiceClient provisioningServiceClient =
                     ProvisioningServiceClient.CreateFromConnectionString(
                         Configuration.GetConnectionString("DpsConnection")))
             {
-                Console.WriteLine("\nCreating a new enrollmentGroup...");
+                _logger.LogInformation("Creating a new enrollmentGroup...");
                 var certificate = new X509Certificate2(pemCertificate);
 
                 Attestation attestation = X509Attestation.CreateFromRootCertificates(certificate);
@@ -36,7 +40,7 @@ namespace DpsManagement
                 {
                     ProvisioningStatus = ProvisioningStatus.Enabled
                 };
-                Console.WriteLine(enrollmentGroup);
+                _logger.LogInformation($"{enrollmentGroup}");
 
                 enrollmentGroup.ReprovisionPolicy = new ReprovisionPolicy
                 {
@@ -54,14 +58,14 @@ namespace DpsManagement
                     new TwinCollection("{\"authenticationType\": \"certificateAuthority\"}")
                 );
 
-                Console.WriteLine("\nAdding new enrollmentGroup...");
+                _logger.LogInformation($"Adding new enrollmentGroup...");
 
                 EnrollmentGroup enrollmentGroupResult = await provisioningServiceClient
                     .CreateOrUpdateEnrollmentGroupAsync(enrollmentGroup)
                     .ConfigureAwait(false);
 
-                Console.WriteLine("\nEnrollmentGroup created with success.");
-                Console.WriteLine(enrollmentGroupResult);
+                _logger.LogInformation($"EnrollmentGroup created with success.");
+                _logger.LogInformation($"{enrollmentGroupResult}");
             }
         }
     }

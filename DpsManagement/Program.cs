@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.IO;
 using System.Reflection;
@@ -12,25 +14,42 @@ namespace DpsManagement
     {
         static async Task Main(string[] args)
         {
+            var location = Assembly.GetEntryAssembly().Location;
+            var directory = Path.GetDirectoryName(location);
             var sp = GetServices();
+            var pathToCerts = $"{directory}/../../../../Certs/";
 
             var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
-            var dpsEnrollmentCertificate = new X509Certificate2("dpsIntermediate2.pem");
+            var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate2.pem");
             await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate2", dpsEnrollmentCertificate);
 
             var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
-            X509Certificate2 deviceCertificate = new X509Certificate2("testdevice02.pfx", "1234");
-            X509Certificate2 enrollmentCertificate = new X509Certificate2("dpsIntermediate1.pfx", "1234");
+            X509Certificate2 deviceCertificate = new X509Certificate2($"{pathToCerts}testdevice02.pfx", "1234");
+            X509Certificate2 enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
             await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
         }
 
         private static ServiceProvider GetServices()
         {
+            ILoggerFactory loggerFactory = new LoggerFactory();
+            loggerFactory.AddSerilog();
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File(
+                  $@"../../../dps.logs",
+                  fileSizeLimitBytes: 1_000_000,
+                  rollOnFileSizeLimit: true,
+                  shared: true)
+                .CreateLogger();
+
             var serviceProvider = new ServiceCollection()
                 .AddCertificateManager()
                 .AddSingleton<IConfiguration>(GetConfig())
                 .AddTransient<DpsRegisterDevice>()
                 .AddTransient<DpsEnrollmentGroup>()
+                .AddSingleton(loggerFactory)
                 .BuildServiceProvider();
 
             return serviceProvider;
