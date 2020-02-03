@@ -27,6 +27,17 @@ namespace DpsManagement
             X509Certificate2 deviceCertificate = new X509Certificate2($"{pathToCerts}testdevice02.pfx", "1234");
             X509Certificate2 enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
             await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
+
+            
+            var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
+            // DISABLE Device iot Hub
+            await ioTHubUpdateDevice.DisableDeviceAsync("testdevice02");
+            // ENABLE Device iot Hub
+            await ioTHubUpdateDevice.EnableDeviceAsync("testdevice02");
+
+            // DISABLE DPS Device
+            var dpsUpdateDevice = sp.GetService<DpsUpdateDevice>();
+            //await dpsUpdateDevice.DisableDevice("testdevice02");
         }
 
         private static ServiceProvider GetServices()
@@ -49,6 +60,8 @@ namespace DpsManagement
                 .AddSingleton<IConfiguration>(GetConfig())
                 .AddTransient<DpsRegisterDevice>()
                 .AddTransient<DpsEnrollmentGroup>()
+                .AddTransient<IoTHubUpdateDevice>()
+                .AddTransient<DpsUpdateDevice>()
                 .AddSingleton(loggerFactory)
                 .BuildServiceProvider();
 

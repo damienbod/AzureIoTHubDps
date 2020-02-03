@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace DpsManagement
 {
@@ -16,19 +17,34 @@ namespace DpsManagement
             Configuration = config;
             _logger = loggerFactory.CreateLogger<DpsUpdateDevice>();
 
-            _provisioningServiceClient = ProvisioningServiceClient
+           _provisioningServiceClient = ProvisioningServiceClient
                 .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
         }
 
-
-        public void DisableDevice(string deviceId)
+        public async Task DisableEnrollmentGroupAsync(string deviceId)
         {
-            //_provisioningServiceClient.
+            var queryResult = await _provisioningServiceClient
+                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
+
         }
 
-        public void EnableDevice(string deviceId)
+        public async Task EnableEnrollmentGroupAsync(string deviceId)
         {
+            var queryResult = await _provisioningServiceClient
+                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
+        }
 
+        public async Task DisableDeviceAsync(string deviceId)
+        {
+            var queryResult = await _provisioningServiceClient
+                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
+
+        }
+
+        public async Task EnableDeviceAsync(string deviceId)
+        {
+            var queryResult = await _provisioningServiceClient
+                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
         }
     }
 }
