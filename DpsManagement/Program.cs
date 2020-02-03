@@ -12,17 +12,18 @@ namespace DpsManagement
 {
     class Program
     {
+        static string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        static string pathToCerts = $"{directory}/../../../../Certs/";
         static async Task Main(string[] args)
         {
-            var location = Assembly.GetEntryAssembly().Location;
-            var directory = Path.GetDirectoryName(location);
             var sp = GetServices();
-            var pathToCerts = $"{directory}/../../../../Certs/";
 
+            // Create Enrollment Group
             var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
             var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate2.pem");
             await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate2", dpsEnrollmentCertificate);
 
+            // Register device to dps and create in iot hub
             var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
             X509Certificate2 deviceCertificate = new X509Certificate2($"{pathToCerts}testdevice02.pfx", "1234");
             X509Certificate2 enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
