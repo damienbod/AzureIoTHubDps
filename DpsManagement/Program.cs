@@ -28,7 +28,6 @@ namespace DpsManagement
             X509Certificate2 enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
             await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
 
-            
             var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
             // DISABLE Device iot Hub
             await ioTHubUpdateDevice.DisableDeviceAsync("testdevice02");
