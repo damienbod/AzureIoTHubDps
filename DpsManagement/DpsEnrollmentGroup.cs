@@ -11,9 +11,6 @@ namespace DpsManagement
 {
     public class DpsEnrollmentGroup
     {
-        private string EnrollmentGroupId = "dpsIntermediate2";
-        private string X509RootCertPath = @"dpsIntermediate2.pem";
-
         private IConfiguration Configuration { get;set;}
 
         public DpsEnrollmentGroup(IConfiguration config)
@@ -21,7 +18,9 @@ namespace DpsManagement
             Configuration = config;
         }
         
-        public async Task CreateDpsEnrollmentGroupAsync()
+        public async Task CreateDpsEnrollmentGroupAsync(
+            string enrollmentGroupId, 
+            X509Certificate2 pemCertificate)
         {
             Console.WriteLine("Starting CreateDpsEnrollmentGroupAsync...");
 
@@ -29,10 +28,10 @@ namespace DpsManagement
                     ProvisioningServiceClient.CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection")))
             {
                 Console.WriteLine("\nCreating a new enrollmentGroup...");
-                var certificate = new X509Certificate2(X509RootCertPath);
+                var certificate = new X509Certificate2(pemCertificate);
 
                 Attestation attestation = X509Attestation.CreateFromRootCertificates(certificate);
-                EnrollmentGroup enrollmentGroup = new EnrollmentGroup(EnrollmentGroupId, attestation)
+                EnrollmentGroup enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
                 {
                     ProvisioningStatus = ProvisioningStatus.Enabled
                 };

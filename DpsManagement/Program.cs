@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace DpsManagement
@@ -14,10 +15,13 @@ namespace DpsManagement
             var sp = GetServices();
 
             var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
-            await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync();
+            var dpsEnrollmentCertificate = new X509Certificate2("dpsIntermediate2.pem");
+            await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate2", dpsEnrollmentCertificate);
 
             var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
-            await dpsRegisterDevice.RegisterDeviceAsync();
+            X509Certificate2 deviceCertificate = new X509Certificate2("testdevice02.pfx", "1234");
+            X509Certificate2 enrollmentCertificate = new X509Certificate2("dpsIntermediate1.pfx", "1234");
+            await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
         }
 
         private static ServiceProvider GetServices()
