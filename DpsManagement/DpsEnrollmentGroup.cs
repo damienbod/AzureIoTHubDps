@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -10,16 +11,22 @@ namespace DpsManagement
 {
     public class DpsEnrollmentGroup
     {
-        private static string ProvisioningConnectionString = "HostName=damienbod.azure-devices-provisioning.net;SharedAccessKeyName=provisioningserviceowner;SharedAccessKey=qaOUyWmuUaC3w/0FC2Hfe+yHGBpe7hHjrwQl7f+vY3M=";
-        private static string EnrollmentGroupId = "dpsIntermediate2";
-        private static string X509RootCertPath = @"dpsIntermediate2.pem";
+        private string EnrollmentGroupId = "dpsIntermediate2";
+        private string X509RootCertPath = @"dpsIntermediate2.pem";
 
+        private IConfiguration Configuration { get;set;}
+
+        public DpsEnrollmentGroup(IConfiguration config)
+        {
+            Configuration = config;
+        }
+        
         public async Task CreateDpsEnrollmentGroupAsync()
         {
             Console.WriteLine("Starting CreateDpsEnrollmentGroupAsync...");
 
             using (ProvisioningServiceClient provisioningServiceClient =
-                    ProvisioningServiceClient.CreateFromConnectionString(ProvisioningConnectionString))
+                    ProvisioningServiceClient.CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection")))
             {
                 Console.WriteLine("\nCreating a new enrollmentGroup...");
                 var certificate = new X509Certificate2(X509RootCertPath);

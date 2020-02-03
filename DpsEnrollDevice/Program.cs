@@ -66,6 +66,5 @@ namespace DpsEnrollDevice
             return 0;
         }
 
-    
     }
 }
