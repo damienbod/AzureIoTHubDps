@@ -25,7 +25,8 @@ namespace DpsManagement
             Console.WriteLine("Starting CreateDpsEnrollmentGroupAsync...");
 
             using (ProvisioningServiceClient provisioningServiceClient =
-                    ProvisioningServiceClient.CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection")))
+                    ProvisioningServiceClient.CreateFromConnectionString(
+                        Configuration.GetConnectionString("DpsConnection")))
             {
                 Console.WriteLine("\nCreating a new enrollmentGroup...");
                 var certificate = new X509Certificate2(pemCertificate);
