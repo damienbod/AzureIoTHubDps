@@ -21,30 +21,43 @@ namespace DpsManagement
                 .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
         }
 
-        public async Task DisableEnrollmentGroupAsync(string deviceId)
+        public async Task DisableEnrollmentGroupAsync(string enrollmentGroupId)
         {
-            var queryResult = await _provisioningServiceClient
-                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
+            var groupEnrollment = await _provisioningServiceClient.GetEnrollmentGroupAsync(enrollmentGroupId);
 
+            if (groupEnrollment.ProvisioningStatus.Value != ProvisioningStatus.Disabled)
+            {
+                groupEnrollment.ProvisioningStatus = ProvisioningStatus.Disabled;
+            }
         }
 
-        public async Task EnableEnrollmentGroupAsync(string deviceId)
+        public async Task EnableEnrollmentGroupAsync(string enrollmentGroupId)
         {
-            var queryResult = await _provisioningServiceClient
-                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
+            QuerySpecification querySpecification = new QuerySpecification("SELECT * FROM enrollments"); // WHERE does not work here..., can only do a select ALL
+            var groupEnrollments = await _provisioningServiceClient.CreateEnrollmentGroupQuery(querySpecification).NextAsync();
+
+            foreach (var devicestring in groupEnrollments.Items)
+            {
+                var enrollment = devicestring as EnrollmentGroup;
+                if (enrollment.EnrollmentGroupId == enrollmentGroupId)
+                {
+                    if (enrollment.ProvisioningStatus.Value != ProvisioningStatus.Enabled)
+                    {
+                        enrollment.ProvisioningStatus = ProvisioningStatus.Enabled;
+                    }
+                }
+            }
         }
 
         public async Task DisableDeviceAsync(string deviceId)
         {
-            var queryResult = await _provisioningServiceClient
-                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
+           
 
         }
 
         public async Task EnableDeviceAsync(string deviceId)
         {
-            var queryResult = await _provisioningServiceClient
-                .CreateEnrollmentGroupQuery(new QuerySpecification("*")).NextAsync();
+          
         }
     }
 }
