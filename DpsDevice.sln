@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertsVerifyCertificate", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DpsCreateIndividualEnrollment", "DpsCreateIndividualEnrollment\DpsCreateIndividualEnrollment.csproj", "{F9FA622B-F7FF-40C2-866A-F117DD8DF478}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DpsManagement", "DpsManagement\DpsManagement.csproj", "{88233E50-8AB3-4B43-B097-CBCA67B98DC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{F9FA622B-F7FF-40C2-866A-F117DD8DF478}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9FA622B-F7FF-40C2-866A-F117DD8DF478}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9FA622B-F7FF-40C2-866A-F117DD8DF478}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88233E50-8AB3-4B43-B097-CBCA67B98DC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88233E50-8AB3-4B43-B097-CBCA67B98DC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88233E50-8AB3-4B43-B097-CBCA67B98DC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88233E50-8AB3-4B43-B097-CBCA67B98DC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -43,7 +43,7 @@ namespace DpsEnrollDevice
         {
 
             var scopeId = "0ne000BC0AC";
-            X509Certificate2 certificate = new X509Certificate2("testdevice01.pfx", "1234");
+            X509Certificate2 certificate = new X509Certificate2("testdevice02.pfx", "1234");
             // The cert from the enrollment group is required for group registrations
             //X509Certificate2 enrollCert = new X509Certificate2("dpsIntermediate1.pfx", "1234");
 

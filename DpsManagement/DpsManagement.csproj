@@ -3,35 +3,24 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>6556e69f-ba37-48cb-aad5-643d5620c84b</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="CertificateManager" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.18.4" />
+    <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Service" Version="1.5.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
+
     <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.22.0" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Client" Version="1.4.1" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Transport.Amqp" Version="1.1.10" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Transport.Http" Version="1.1.7" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Transport.Mqtt" Version="1.1.9" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <None Update="dpsIntermediate1.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="dpsIntermediate2.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="testDevice01.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="testDevice01.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="testDevice02.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestDevice02.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   
 </Project>

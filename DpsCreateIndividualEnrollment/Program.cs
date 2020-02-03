@@ -15,8 +15,8 @@ namespace DpsCreateEnrollmentGroup
     class Program
     {
         private static string ProvisioningConnectionString = "HostName=damienbod.azure-devices-provisioning.net;SharedAccessKeyName=provisioningserviceowner;SharedAccessKey=qaOUyWmuUaC3w/0FC2Hfe+yHGBpe7hHjrwQl7f+vY3M=";
-        private static string IndividualEnrollmentId = "testdevice01";
-        private static string X509RootCertPath = @"testdevice01.pem";
+        private static string IndividualEnrollmentId = "testdevice02";
+        private static string X509RootCertPath = @"testdevice02.pem";
 
         static void Main(string[] args)
         {
@@ -61,11 +61,14 @@ namespace DpsCreateEnrollmentGroup
                     //            attestation);
 
                     IndividualEnrollment individualEnrollment =
-                            new IndividualEnrollment(
-                                    IndividualEnrollmentId,
-                                    attestation)
+                            new IndividualEnrollment(IndividualEnrollmentId, attestation)
                             {
-                                ProvisioningStatus = ProvisioningStatus.Disabled
+                                ProvisioningStatus = ProvisioningStatus.Enabled,
+                                DeviceId = "testdevice02",
+                                Capabilities = new Microsoft.Azure.Devices.Shared.DeviceCapabilities
+                                {
+                                    IotEdge = true
+                                }
                             };
 
                     Console.WriteLine(individualEnrollment);
