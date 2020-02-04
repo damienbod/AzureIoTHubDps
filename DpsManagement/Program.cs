@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Azure.Devices.Provisioning.Service;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -29,20 +30,22 @@ namespace DpsManagement
             //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 
             // Register device to dps and create in iot hub
-            var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
-            X509Certificate2 deviceCertificate = new X509Certificate2($"{pathToCerts}testdevice01.pfx", "1234");
-            X509Certificate2 enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
-            await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
+            //var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
+            //var deviceCertificate = new X509Certificate2($"{pathToCerts}testdevice01.pfx", "1234");
+            //var enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
+            //await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
 
-            //var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
-            //// DISABLE Device iot Hub
-            //await ioTHubUpdateDevice.DisableDeviceAsync("testdevice02");
+            //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync().ConfigureAwait(false);
+
+            var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
+            // DISABLE Device iot Hub
+            await ioTHubUpdateDevice.DisableDeviceAsync("testdevice01");
             //// ENABLE Device iot Hub
             //await ioTHubUpdateDevice.EnableDeviceAsync("testdevice02");
 
             // DISABLE DPS Device
-            //var dpsUpdateDevice = sp.GetService<DpsUpdateDevice>();
-            //await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate2");
+            var dpsUpdateDevice = sp.GetService<DpsUpdateDevice>();
+            await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate1");
 
             //await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate2");
         }
