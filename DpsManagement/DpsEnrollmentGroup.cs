@@ -35,7 +35,7 @@ namespace DpsManagement
                 _logger.LogInformation("Creating a new enrollmentGroup...");
                 var certificate = new X509Certificate2(pemCertificate);
 
-                Attestation attestation = X509Attestation.CreateFromRootCertificates(certificate);
+                Attestation attestation = X509Attestation.CreateFromClientCertificates(certificate);
                 EnrollmentGroup enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
                 {
                     ProvisioningStatus = ProvisioningStatus.Enabled,
@@ -50,7 +50,7 @@ namespace DpsManagement
                     },
                     InitialTwinState = new TwinState(
                         new TwinCollection("{ \"updatedby\":\"" + "damien" + "\", \"timeZone\":\"" + TimeZoneInfo.Local.DisplayName + "\" }"),
-                        new TwinCollection("{ \"authenticationType\": \"certificateAuthority\"}")
+                        new TwinCollection("{ }")
                     )
                 };
                 _logger.LogInformation($"{enrollmentGroup}");

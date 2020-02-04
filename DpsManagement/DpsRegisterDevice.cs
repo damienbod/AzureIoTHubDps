@@ -3,6 +3,7 @@ using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -24,7 +25,6 @@ namespace DpsManagement
             X509Certificate2 enrollmentCertificate)
         {
             var scopeId = Configuration["ScopeId"];
-            //X509Certificate2 certificate = new X509Certificate2("testdevice02.pfx", "1234");
             //// The cert from the enrollment group is required for group registrations
             //X509Certificate2 enrollmentCertificate = new X509Certificate2("dpsIntermediate1.pfx", "1234");
 

@@ -21,13 +21,14 @@ namespace DpsManagement
             // Create Enrollment Group
             var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
             var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsCa.pem");
-            await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate2", dpsEnrollmentCertificate);
+            await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
 
             // Register device to dps and create in iot hub
-            var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
-            X509Certificate2 deviceCertificate = new X509Certificate2($"{pathToCerts}testdevice02.pfx", "1234");
-            X509Certificate2 enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
-            await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
+            //var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
+            //X509Certificate2 deviceCertificate = new X509Certificate2($"{pathToCerts}testdevice01.pfx", "1234");
+            //X509Certificate2 enrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
+            //X509Certificate2 root = new X509Certificate2($"{pathToCerts}dpsCa.pfx", "1234");
+            //await dpsRegisterDevice.RegisterDeviceAsync(deviceCertificate, enrollmentCertificate);
 
             //var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
             //// DISABLE Device iot Hub
@@ -36,10 +37,10 @@ namespace DpsManagement
             //await ioTHubUpdateDevice.EnableDeviceAsync("testdevice02");
 
             // DISABLE DPS Device
-            var dpsUpdateDevice = sp.GetService<DpsUpdateDevice>();
-            await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate2");
+            //var dpsUpdateDevice = sp.GetService<DpsUpdateDevice>();
+            //await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate2");
 
-            await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate2");
+            //await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate2");
         }
 
         private static ServiceProvider GetServices()
@@ -62,6 +63,7 @@ namespace DpsManagement
                 .AddSingleton<IConfiguration>(GetConfig())
                 .AddTransient<DpsRegisterDevice>()
                 .AddTransient<DpsEnrollmentGroup>()
+                .AddTransient<DpsIndividualEnrollment>()
                 .AddTransient<IoTHubUpdateDevice>()
                 .AddTransient<DpsUpdateDevice>()
                 .AddSingleton(loggerFactory)
