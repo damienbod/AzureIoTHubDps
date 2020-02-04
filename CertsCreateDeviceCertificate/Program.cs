@@ -19,6 +19,7 @@ namespace CertsCreateDeviceCertificate
                 .BuildServiceProvider();
 
             var createClientServerAuthCerts = serviceProvider.GetService<CreateCertificatesClientServerAuth>();
+            var iec = serviceProvider.GetService<ImportExportCertificate>();
 
             var intermediate = new X509Certificate2("dpsIntermediate1.pfx", "1234");
 
@@ -33,7 +34,12 @@ namespace CertsCreateDeviceCertificate
 
             var deviceInPfxBytes = importExportCertificate.ExportChainedCertificatePfx(password, device, intermediate);
             File.WriteAllBytes("testdevice01.pfx", deviceInPfxBytes);
-    
+
+            var devicePEM = iec.PemExportPublicKeyCertificate(device);
+            File.WriteAllText("testdevice01.pem", devicePEM);
+
+   
+
         }
     }
 }

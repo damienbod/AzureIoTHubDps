@@ -19,9 +19,14 @@ namespace DpsManagement
             var sp = GetServices();
 
             // Create Enrollment Group
-            var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
-            var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pem");
-            await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
+            //var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
+            //var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pem");
+            //await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
+
+            // Create individual enrollment
+            //var dpsIndividualEnrollment = sp.GetService<DpsIndividualEnrollment>();
+            //var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}testdevice01.pem");
+            //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 
             // Register device to dps and create in iot hub
             var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
