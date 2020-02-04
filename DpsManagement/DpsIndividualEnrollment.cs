@@ -53,15 +53,16 @@ namespace DpsManagement
                                 },
                                 InitialTwinState = new TwinState(
                                    new Microsoft.Azure.Devices.Shared.TwinCollection("{ \"updatedby\":\"" + "damien" + "\", \"timeZone\":\"" + TimeZoneInfo.Local.DisplayName + "\" }"),
-                                   new Microsoft.Azure.Devices.Shared.TwinCollection("{}"))
+                                   new Microsoft.Azure.Devices.Shared.TwinCollection("{}")
+                                ),
+                                ReprovisionPolicy = new ReprovisionPolicy
+                                {
+                                    MigrateDeviceData = false,
+                                    UpdateHubAssignment = true
+                                }
                             };
 
                     _logger.LogInformation($"{individualEnrollment}");
-              
-                    individualEnrollment.ReprovisionPolicy = new ReprovisionPolicy();
-                    individualEnrollment.ReprovisionPolicy.MigrateDeviceData = false;
-                    individualEnrollment.ReprovisionPolicy.UpdateHubAssignment = true;
-
                     _logger.LogInformation("Adding new individualEnrollment...");
 
                     var individualEnrollmentResult =

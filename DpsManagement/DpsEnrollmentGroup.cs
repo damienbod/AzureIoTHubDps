@@ -35,7 +35,7 @@ namespace DpsManagement
                 _logger.LogInformation("Creating a new enrollmentGroup...");
                 var certificate = new X509Certificate2(pemCertificate);
 
-                Attestation attestation = X509Attestation.CreateFromClientCertificates(certificate);
+                Attestation attestation = X509Attestation.CreateFromRootCertificates(certificate);
                 EnrollmentGroup enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
                 {
                     ProvisioningStatus = ProvisioningStatus.Enabled,

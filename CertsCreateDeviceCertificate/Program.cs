@@ -20,19 +20,19 @@ namespace CertsCreateDeviceCertificate
 
             var createClientServerAuthCerts = serviceProvider.GetService<CreateCertificatesClientServerAuth>();
 
-            var intermediate = new X509Certificate2("dpsIntermediate2.pfx", "1234");
+            var intermediate = new X509Certificate2("dpsIntermediate1.pfx", "1234");
 
             var device = createClientServerAuthCerts.NewDeviceChainedCertificate(
-                new DistinguishedName { CommonName = "testdevice02" },
+                new DistinguishedName { CommonName = "testdevice01" },
                 new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
-                "testdevice02", intermediate);
-            device.FriendlyName = "IoT device testdevice02";
+                "testdevice01", intermediate);
+            device.FriendlyName = "IoT device testdevice01";
       
             string password = "1234";
             var importExportCertificate = serviceProvider.GetService<ImportExportCertificate>();
 
             var deviceInPfxBytes = importExportCertificate.ExportChainedCertificatePfx(password, device, intermediate);
-            File.WriteAllBytes("testdevice02.pfx", deviceInPfxBytes);
+            File.WriteAllBytes("testdevice01.pfx", deviceInPfxBytes);
     
         }
     }

@@ -23,10 +23,10 @@ namespace CertsVerifyCertificate
 
             var importExportCertificate = serviceProvider.GetService<ImportExportCertificate>();
 
-            var root = new X509Certificate2("dpsIntermediate2.pfx", "1234");
+            var root = new X509Certificate2("dpsCa.pfx", "1234");
 
             var verify = createClientServerAuthCerts.NewDeviceVerificationCertificate(
-            "B58A527D3B559B9EA1F23AFEEE719F7F6D034E0A97EAB260", root);
+            "F61FA95B0A5792E3839C4364079A67E590D3FEB636BEFAA5", root);
             verify.FriendlyName = "verify";
 
             var verifyPEM = importExportCertificate.PemExportPublicKeyCertificate(verify);
