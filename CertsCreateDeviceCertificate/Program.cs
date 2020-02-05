@@ -3,6 +3,7 @@ using CertificateManager.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 
 namespace CertsCreateDeviceCertificate
@@ -12,6 +13,8 @@ namespace CertsCreateDeviceCertificate
     /// </summary>
     class Program
     {
+        static string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        static string pathToCerts = $"{directory}/../../../../Certs/";
         static void Main(string[] args)
         {
             var serviceProvider = new ServiceCollection()
@@ -21,7 +24,7 @@ namespace CertsCreateDeviceCertificate
             var createClientServerAuthCerts = serviceProvider.GetService<CreateCertificatesClientServerAuth>();
             var iec = serviceProvider.GetService<ImportExportCertificate>();
 
-            var intermediate = new X509Certificate2("dpsIntermediate1.pfx", "1234");
+            var intermediate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
 
             var device = createClientServerAuthCerts.NewDeviceChainedCertificate(
                 new DistinguishedName { CommonName = "testdevice01" },
