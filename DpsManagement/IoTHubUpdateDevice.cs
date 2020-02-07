@@ -18,6 +18,29 @@ namespace DpsManagement
             _logger = loggerFactory.CreateLogger<IoTHubUpdateDevice>();
             _registryManager = RegistryManager.CreateFromConnectionString(
                 Configuration.GetConnectionString("IoTHubConnection"));
+
+        }
+
+        /// <summary>
+        /// null to set a CertificateAuthority
+        /// otherwise self signed
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <param name="thumbprint">null to set a CertificateAuthority</param>
+        /// <returns></returns>
+        public async Task UpdateAuthDeviceCertificateAuthorityAsync(string deviceId, string thumbprint)
+        {
+            var device = await _registryManager.GetDeviceAsync(deviceId);
+            device.Authentication = new AuthenticationMechanism
+            {
+                X509Thumbprint = new X509Thumbprint
+                {
+                    PrimaryThumbprint = thumbprint
+                },
+                Type = AuthenticationType.CertificateAuthority
+            };
+            device = await _registryManager.UpdateDeviceAsync(device);
+            _logger.LogInformation($"iot hub device updated  {device}");
         }
 
         public async Task DisableDeviceAsync(string deviceId)
