@@ -39,7 +39,7 @@ namespace DpsManagement
 
             var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
 
-            await ioTHubUpdateDevice.UpdateAuthDeviceAsync("testdevice01", null);
+            await ioTHubUpdateDevice.UpdateAuthDeviceCertificateAuthorityAsync("testdevice01", null);
 
             // DISABLE Device iot Hub
             await ioTHubUpdateDevice.DisableDeviceAsync("testdevice01");
