@@ -17,52 +17,50 @@ namespace DpsManagement
     {
         static string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         static string pathToCerts = $"{directory}/../../../../Certs/";
+        static ServiceProvider _sp;
         static async Task Main(string[] args)
         {
-            var sp = GetServices();
+            InitServices();
 
-            /// DPS Create Enrollment Group
+            /// -- DPS Create Enrollment Group
             //var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
             //var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pem");
             //await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
             
-            /// DPS create certificte, then enrollment group
-            //var dpsCaCertificate = new X509Certificate2($"{pathToCerts}dpsCa.pfx", "1234");
-            //var cert = await CreateEnrollmentGroup("engroup", dpsCaCertificate, "1234");
+            /// -- DPS create certificte, then enrollment group
+            var dpsCaCertificate = new X509Certificate2($"{pathToCerts}dpsCa.pfx", "1234");
+            var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
 
-            /// DPS Create individual enrollment
+            /// -- DPS Create individual enrollment
             //var dpsIndividualEnrollment = sp.GetService<DpsIndividualEnrollment>();
             //var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}testdevice01.pem");
             //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 
-            /// Create certificate, register device to dps and create in iot hub
+            /// -- Create certificate, register device to dps and create in iot hub
             var dpsIntermediate1 = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
-            await CreateDeviceAsync("will", dpsIntermediate1, "1234");
+            await CreateDeviceAsync("will4", dpsIntermediate1, "1234");
             //await CreateDeviceAsync("yes", dpsIntermediate1, "1234");
 
             //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync().ConfigureAwait(false);
 
-            /// DISABLE / ENABLE IoT Hub Device
+            /// -- DISABLE / ENABLE IoT Hub Device
             //var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
             //await ioTHubUpdateDevice.UpdateAuthDeviceCertificateAuthorityAsync("testdevice01", null);
             //await ioTHubUpdateDevice.DisableDeviceAsync("testdevice01");
             //await ioTHubUpdateDevice.EnableDeviceAsync("testdevice01");
 
-            /// DISABLE / ENABLE DPS EnrollmentGroup
+            /// -- DISABLE / ENABLE DPS EnrollmentGroup
             //var dpsUpdateDevice = sp.GetService<DpsUpdateDevice>();
             //await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate1");
             //await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate1");
         }
 
         private static async Task<X509Certificate2> CreateEnrollmentGroup(
-            string enrollmentGroup, 
-            X509Certificate2 parentCert, 
-            string password)
+            string enrollmentGroup, X509Certificate2 parentCert)
         {
-            var sp = GetServices();
-            var cc = sp.GetService<CreateCertificatesClientServerAuth>();
-            var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
-            var iec = sp.GetService<ImportExportCertificate>();
+            var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
+            var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
+            var iec = _sp.GetService<ImportExportCertificate>();
 
             var enrollmentGroupCert = cc.NewIntermediateChainedCertificate(
                new DistinguishedName { CommonName = enrollmentGroup },
@@ -70,26 +68,21 @@ namespace DpsManagement
                2, enrollmentGroup, parentCert);
             enrollmentGroupCert.FriendlyName = $"{enrollmentGroup} certificate";
 
-            var enrollmentGroupInPfxBytes = iec.ExportChainedCertificatePfx(password, enrollmentGroupCert, parentCert);
-            var enrollmentGroupCertPfx = new X509Certificate2(enrollmentGroupInPfxBytes, password);
-            var enrollmentGroupPEM = iec.PemExportPublicKeyCertificate(enrollmentGroupCertPfx);
+            var enrollmentGroupPEM = iec.PemExportPublicKeyCertificate(enrollmentGroupCert);
             var cert = iec.PemImportCertificate(enrollmentGroupPEM);
-            var dpsEnrollment = new X509Certificate2(cert);
 
-            await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(enrollmentGroup, dpsEnrollment);
-            return enrollmentGroupCertPfx;
+            await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(
+                enrollmentGroup, new X509Certificate2(cert));
+            return enrollmentGroupCert;
         }
 
         private static async Task<X509Certificate2> CreateDeviceAsync(
-            string deviceId, 
-            X509Certificate2 parentCertificate,
-            string password)
+            string deviceId, X509Certificate2 parentCertificate, string password)
         {
             deviceId = deviceId.ToLower();
-            var sp = GetServices();
-            var cc = sp.GetService<CreateCertificatesClientServerAuth>();
-            var dpsRegisterDevice = sp.GetService<DpsRegisterDevice>();
-            var iec = sp.GetService<ImportExportCertificate>();
+            var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
+            var iec = _sp.GetService<ImportExportCertificate>();
+            var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>();
 
             var device = cc.NewDeviceChainedCertificate(
                 new DistinguishedName { CommonName = deviceId },
@@ -106,7 +99,7 @@ namespace DpsManagement
         }
 
 
-        private static ServiceProvider GetServices()
+        private static void InitServices()
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
             loggerFactory.AddSerilog();
@@ -121,7 +114,7 @@ namespace DpsManagement
                   shared: true)
                 .CreateLogger();
 
-            var serviceProvider = new ServiceCollection()
+            _sp = new ServiceCollection()
                 .AddCertificateManager()
                 .AddSingleton<IConfiguration>(GetConfig())
                 .AddTransient<DpsRegisterDevice>()
@@ -131,8 +124,6 @@ namespace DpsManagement
                 .AddTransient<DpsUpdateDevice>()
                 .AddSingleton(loggerFactory)
                 .BuildServiceProvider();
-
-            return serviceProvider;
         }
 
         private static IConfigurationRoot GetConfig()
