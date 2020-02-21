@@ -9,15 +9,15 @@
     <PackageReference Include="CertificateManager" Version="1.0.3" />
     <PackageReference Include="Microsoft.Azure.Devices" Version="1.18.4" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Service" Version="1.5.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
-
     <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.22.0" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Client" Version="1.4.1" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Transport.Amqp" Version="1.1.10" />
+    
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Transport.Http" Version="1.1.7" />
     <PackageReference Include="Microsoft.Azure.Devices.Provisioning.Transport.Mqtt" Version="1.1.9" />
 
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.1" />
