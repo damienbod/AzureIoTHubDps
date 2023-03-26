@@ -25,13 +25,13 @@ class Program
         //await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
 
         /// -- DPS create certificte, then enrollment group
-        var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
-        var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
+        //var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
+        //var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
 
         /// -- DPS Create individual enrollment
-        //var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
-        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
-        //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
+        var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
+        var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
+        await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 
         /// -- Create certificate, register device to dps and create in iot hub
         //var dpsIntermediate1 = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");

@@ -35,25 +35,24 @@ public class DpsIndividualEnrollment
             //            IndividualEnrollmentId,
             //            attestation);
 
-            IndividualEnrollment individualEnrollment =
-                new IndividualEnrollment(individualEnrollmentId, attestation)
+            var individualEnrollment = new IndividualEnrollment(individualEnrollmentId, attestation)
+            {
+                ProvisioningStatus = ProvisioningStatus.Enabled,
+                DeviceId = individualEnrollmentId,
+                Capabilities = new Microsoft.Azure.Devices.Shared.DeviceCapabilities
                 {
-                    ProvisioningStatus = ProvisioningStatus.Enabled,
-                    DeviceId = individualEnrollmentId,
-                    Capabilities = new Microsoft.Azure.Devices.Shared.DeviceCapabilities
-                    {
-                        IotEdge = true
-                    },
-                    InitialTwinState = new TwinState(
-                        new Microsoft.Azure.Devices.Shared.TwinCollection("{ \"updatedby\":\"" + "damien" + "\", \"timeZone\":\"" + TimeZoneInfo.Local.DisplayName + "\" }"),
-                        new Microsoft.Azure.Devices.Shared.TwinCollection("{}")
-                    ),
-                    ReprovisionPolicy = new ReprovisionPolicy
-                    {
-                        MigrateDeviceData = false,
-                        UpdateHubAssignment = true
-                    }
-                };
+                    IotEdge = true
+                },
+                InitialTwinState = new TwinState(
+                    new Microsoft.Azure.Devices.Shared.TwinCollection("{ \"updatedby\":\"" + "damien" + "\", \"timeZone\":\"" + TimeZoneInfo.Local.DisplayName + "\" }"),
+                    new Microsoft.Azure.Devices.Shared.TwinCollection("{}")
+                ),
+                ReprovisionPolicy = new ReprovisionPolicy
+                {
+                    MigrateDeviceData = false,
+                    UpdateHubAssignment = true
+                }
+            };
 
             _logger.LogInformation($"{individualEnrollment}");
             _logger.LogInformation("Adding new individualEnrollment...");
@@ -61,7 +60,7 @@ public class DpsIndividualEnrollment
             var individualEnrollmentResult =
                 await provisioningServiceClient.CreateOrUpdateIndividualEnrollmentAsync(individualEnrollment);
 
-            _logger.LogInformation("EnrollmentGroup created with success.");
+            _logger.LogInformation("individualEnrollment created with success.");
             _logger.LogInformation($"{individualEnrollmentResult}");
         }
     }
