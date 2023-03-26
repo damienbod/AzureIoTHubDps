@@ -38,7 +38,7 @@ public class DpsRegisterDevice
             var client = ProvisioningDeviceClient.Create(
                 "global.azure-devices-provisioning.net", scopeId, security, transport);
             var result = await client.RegisterAsync();
-            _logger.LogInformation($"DPS client created: {result}");
+            _logger.LogInformation("DPS client created: {result}", result);
             return result;
         }
     }

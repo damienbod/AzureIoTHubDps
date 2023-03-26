@@ -40,7 +40,7 @@ public class DpsIndividualEnrollment
                 DeviceId = individualEnrollmentId,
                 Capabilities = new Microsoft.Azure.Devices.Shared.DeviceCapabilities
                 {
-                    IotEdge = true
+                    IotEdge = false
                 },
                 InitialTwinState = new TwinState(
                     new Microsoft.Azure.Devices.Shared.TwinCollection("{ \"updatedby\":\"" + "damien" + "\", \"timeZone\":\"" + TimeZoneInfo.Local.DisplayName + "\" }"),
@@ -53,7 +53,7 @@ public class DpsIndividualEnrollment
                 }
             };
 
-            _logger.LogInformation($"{individualEnrollment}");
+            _logger.LogInformation("{individualEnrollment}", individualEnrollment);
             _logger.LogInformation("Adding new individualEnrollment...");
 
             //var deviceStatus = await provisioningServiceClient.GetDeviceRegistrationStateAsync(individualEnrollmentId);
@@ -63,7 +63,7 @@ public class DpsIndividualEnrollment
                 await provisioningServiceClient.CreateOrUpdateIndividualEnrollmentAsync(individualEnrollment);
 
             _logger.LogInformation("individualEnrollment created with success.");
-            _logger.LogInformation($"{individualEnrollmentResult}");
+            _logger.LogInformation("{individualEnrollmentResult}", individualEnrollmentResult);
         }
     }
 }
