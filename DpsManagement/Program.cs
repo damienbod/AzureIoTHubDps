@@ -11,9 +11,10 @@ namespace DpsManagement;
 
 class Program
 {
-    static string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-    static string pathToCerts = $"{directory}/../../../../Certs/";
-    static ServiceProvider _sp;
+    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+    static readonly string _pathToCerts = $"{_directory}/../../../../Certs/";
+    static ServiceProvider? _sp;
+
     static async Task Main(string[] args)
     {
         InitServices();
@@ -24,7 +25,7 @@ class Program
         //await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
         
         /// -- DPS create certificte, then enrollment group
-        var dpsCaCertificate = new X509Certificate2($"{pathToCerts}dpsCa.pfx", "1234");
+        var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
         var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
 
         /// -- DPS Create individual enrollment
@@ -33,7 +34,7 @@ class Program
         //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 
         /// -- Create certificate, register device to dps and create in iot hub
-        var dpsIntermediate1 = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
+        var dpsIntermediate1 = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
         await CreateDeviceAsync("will4", dpsIntermediate1, "1234");
         //await CreateDeviceAsync("yes", dpsIntermediate1, "1234");
 
@@ -54,9 +55,15 @@ class Program
     private static async Task<X509Certificate2> CreateEnrollmentGroup(
         string enrollmentGroup, X509Certificate2 parentCert)
     {
+        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
+
         var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
         var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
         var iec = _sp.GetService<ImportExportCertificate>();
+
+        if (cc == null) throw new ArgumentNullException(nameof(cc));
+        if (dpsEnrollmentGroup == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroup));
+        if (iec == null) throw new ArgumentNullException(nameof(iec));
 
         var enrollmentGroupCert = cc.NewIntermediateChainedCertificate(
            new DistinguishedName { CommonName = enrollmentGroup },
@@ -75,10 +82,18 @@ class Program
     private static async Task<X509Certificate2> CreateDeviceAsync(
         string deviceId, X509Certificate2 parentCertificate, string password)
     {
-        deviceId = deviceId.ToLower();
+        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
+
         var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
+        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>(); ;
         var iec = _sp.GetService<ImportExportCertificate>();
-        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>();
+
+        if (cc == null) throw new ArgumentNullException(nameof(cc));
+        if (dpsRegisterDevice == null) throw new ArgumentNullException(nameof(dpsRegisterDevice));
+        if (iec == null) throw new ArgumentNullException(nameof(iec));
+
+        deviceId = deviceId.ToLower();
+        
 
         var device = cc.NewDeviceChainedCertificate(
             new DistinguishedName { CommonName = deviceId },
@@ -124,7 +139,7 @@ class Program
 
     private static IConfigurationRoot GetConfig()
     {
-        var location = Assembly.GetEntryAssembly().Location;
+        var location = Assembly.GetEntryAssembly()!.Location;
         var directory = Path.GetDirectoryName(location);
         var config = new ConfigurationBuilder();
 

@@ -10,8 +10,8 @@ namespace CertsVerifyCertificate;
 /// </summary>
 class Program
 {
-    static string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
-    static string _pathToCerts = $"{_directory}/../../../../Certs/";
+    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+    static readonly string _pathToCerts = $"{_directory}/../../../../Certs/";
 
     static void Main(string[] args)
     {
