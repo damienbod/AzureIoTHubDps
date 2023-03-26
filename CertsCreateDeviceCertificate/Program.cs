@@ -11,8 +11,9 @@ namespace CertsCreateDeviceCertificate;
 /// </summary>
 class Program
 {
-    static string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-    static string pathToCerts = $"{directory}/../../../../Certs/";
+    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+    static readonly string _pathToCerts = $"{_directory}/../../../../Certs/";
+
     static void Main(string[] args)
     {
         var serviceProvider = new ServiceCollection()
@@ -21,8 +22,10 @@ class Program
 
         var createClientServerAuthCerts = serviceProvider.GetService<CreateCertificatesClientServerAuth>();
         var iec = serviceProvider.GetService<ImportExportCertificate>();
+        if (createClientServerAuthCerts == null) throw new ArgumentNullException(nameof(createClientServerAuthCerts));
+        if (iec == null) throw new ArgumentNullException(nameof(iec));
 
-        var intermediate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pfx", "1234");
+        var intermediate = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
 
         var device = createClientServerAuthCerts.NewDeviceChainedCertificate(
             new DistinguishedName { CommonName = "testdevice01" },
@@ -31,15 +34,11 @@ class Program
         device.FriendlyName = "IoT device testdevice01";
   
         string password = "1234";
-        var importExportCertificate = serviceProvider.GetService<ImportExportCertificate>();
 
-        var deviceInPfxBytes = importExportCertificate.ExportChainedCertificatePfx(password, device, intermediate);
+        var deviceInPfxBytes = iec.ExportChainedCertificatePfx(password, device, intermediate);
         File.WriteAllBytes("testdevice01.pfx", deviceInPfxBytes);
 
         var devicePEM = iec.PemExportPublicKeyCertificate(device);
         File.WriteAllText("testdevice01.pem", devicePEM);
-
-
-
     }
 }
