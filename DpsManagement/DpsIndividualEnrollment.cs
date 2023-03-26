@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Devices.Provisioning.Service;
+﻿using Microsoft.Azure.Devices.Provisioning.Client;
+using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography.X509Certificates;
@@ -17,9 +18,7 @@ public class DpsIndividualEnrollment
         _logger = loggerFactory.CreateLogger<DpsIndividualEnrollment>();
     }
 
-    public async Task CreateIndividualEnrollment(
-        string individualEnrollmentId,
-        X509Certificate2 enrollmentCertificate)
+    public async Task CreateIndividualEnrollment(string individualEnrollmentId, X509Certificate2 enrollmentCertificate)
     {
         _logger.LogInformation("Starting CreateIndividualEnrollment...");
 
@@ -56,6 +55,9 @@ public class DpsIndividualEnrollment
 
             _logger.LogInformation($"{individualEnrollment}");
             _logger.LogInformation("Adding new individualEnrollment...");
+
+            //var deviceStatus = await provisioningServiceClient.GetDeviceRegistrationStateAsync(individualEnrollmentId);
+            //var deviceEnrollment = await provisioningServiceClient.GetIndividualEnrollmentAsync(individualEnrollmentId);
 
             var individualEnrollmentResult =
                 await provisioningServiceClient.CreateOrUpdateIndividualEnrollmentAsync(individualEnrollment);
