@@ -5,7 +5,12 @@
 
 [Provisioning X.509 Devices for Azure IoT Hub using .NET Core](https://damienbod.com/2020/02/20/provisioning-x-509-devices-for-azure-iot-hub-using-net-core/)
 
-User secrets:
+
+## User secrets:
+
+You can find the DPS/IoT Hub Connection Strings in the portal:
+- Azure IoT Hub Device Provisioning Service (DPS) | Shared access policies
+- IoT Hub | Shared access policies
 
 ```json
 {
@@ -14,7 +19,6 @@ User secrets:
     "IoTHubConnection": "--your-connectionstring--"
   }
 }
-
 ```
 
 # Links
