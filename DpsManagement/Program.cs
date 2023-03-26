@@ -20,34 +20,35 @@ class Program
         InitServices();
 
         /// -- DPS Create Enrollment Group
-        //var dpsEnrollmentGroup = sp.GetService<DpsEnrollmentGroup>();
-        //var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}dpsIntermediate1.pem");
+        //var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
+        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pem");
         //await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
-        
+
         /// -- DPS create certificte, then enrollment group
         var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
         var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
 
         /// -- DPS Create individual enrollment
-        //var dpsIndividualEnrollment = sp.GetService<DpsIndividualEnrollment>();
-        //var dpsEnrollmentCertificate = new X509Certificate2($"{pathToCerts}testdevice01.pem");
+        //var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
+        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
         //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 
         /// -- Create certificate, register device to dps and create in iot hub
-        var dpsIntermediate1 = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
-        await CreateDeviceAsync("will4", dpsIntermediate1, "1234");
+        //var dpsIntermediate1 = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
+        //await CreateDeviceAsync("will4", dpsIntermediate1, "1234");
         //await CreateDeviceAsync("yes", dpsIntermediate1, "1234");
 
-        //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync().ConfigureAwait(false);
+        //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync();
 
         /// -- DISABLE / ENABLE IoT Hub Device
-        //var ioTHubUpdateDevice = sp.GetService<IoTHubUpdateDevice>();
-        //await ioTHubUpdateDevice.UpdateAuthDeviceCertificateAuthorityAsync("testdevice01", null);
+        //var ioTHubUpdateDevice = _sp.GetService<IoTHubUpdateDevice>();
+        //var thumbprint = "861FA67FB61BAEC0B950B69FF1D643D80554D3E8";
+        //await ioTHubUpdateDevice.UpdateAuthDeviceCertificateAuthorityAsync("testdevice01", thumbprint);
         //await ioTHubUpdateDevice.DisableDeviceAsync("testdevice01");
         //await ioTHubUpdateDevice.EnableDeviceAsync("testdevice01");
 
         /// -- DISABLE / ENABLE DPS EnrollmentGroup
-        //var dpsUpdateDevice = sp.GetService<DpsUpdateDevice>();
+        //var dpsUpdateDevice = _sp.GetService<DpsUpdateDevice>();
         //await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate1");
         //await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate1");
     }
@@ -93,7 +94,6 @@ class Program
         if (iec == null) throw new ArgumentNullException(nameof(iec));
 
         deviceId = deviceId.ToLower();
-        
 
         var device = cc.NewDeviceChainedCertificate(
             new DistinguishedName { CommonName = deviceId },
@@ -108,7 +108,6 @@ class Program
 
         return device;
     }
-
 
     private static void InitServices()
     {

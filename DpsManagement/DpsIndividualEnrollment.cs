@@ -59,9 +59,8 @@ public class DpsIndividualEnrollment
             _logger.LogInformation("Adding new individualEnrollment...");
 
             var individualEnrollmentResult =
-                await provisioningServiceClient
-                    .CreateOrUpdateIndividualEnrollmentAsync(individualEnrollment)
-                    .ConfigureAwait(false);
+                await provisioningServiceClient.CreateOrUpdateIndividualEnrollmentAsync(individualEnrollment);
+
             _logger.LogInformation("EnrollmentGroup created with success.");
             _logger.LogInformation($"{individualEnrollmentResult}");
         }

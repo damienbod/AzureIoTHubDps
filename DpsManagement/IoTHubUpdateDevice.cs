@@ -57,7 +57,7 @@ public class IoTHubUpdateDevice
         _logger.LogInformation($"iot hub device enabled  {device}");
     }
 
-    //public async Task quuu(string deviceId)
+    //public async Task QueryDevice(string deviceId)
     //{
     //    //var devices = await _registryManager.CreateQuery("SELECT * FROM devices WHERE status = 'disabled'").GetNextAsJsonAsync();
 

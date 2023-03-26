@@ -50,8 +50,7 @@ public class DpsEnrollmentGroup
         _logger.LogInformation($"Adding new enrollmentGroup...");
 
         EnrollmentGroup enrollmentGroupResult = await _provisioningServiceClient
-            .CreateOrUpdateEnrollmentGroupAsync(enrollmentGroup)
-            .ConfigureAwait(false);
+            .CreateOrUpdateEnrollmentGroupAsync(enrollmentGroup);
 
         _logger.LogInformation($"EnrollmentGroup created with success.");
         _logger.LogInformation($"{enrollmentGroupResult}");
@@ -63,7 +62,7 @@ public class DpsEnrollmentGroup
         using (Query registrationQuery = _provisioningServiceClient.CreateEnrollmentGroupRegistrationStateQuery(querySpecification, group.EnrollmentGroupId))
         {
             _logger.LogInformation($"Querying the next registrations within group '{group.EnrollmentGroupId}'...");
-            QueryResult registrationQueryResult = await registrationQuery.NextAsync().ConfigureAwait(false);
+            QueryResult registrationQueryResult = await registrationQuery.NextAsync();
             _logger.LogInformation($"{registrationQueryResult}");
         }
     }
@@ -77,12 +76,12 @@ public class DpsEnrollmentGroup
             while (query.HasNext())
             {
                 _logger.LogInformation("Querying the next enrollmentGroups...");
-                QueryResult queryResult = await query.NextAsync().ConfigureAwait(false);
+                QueryResult queryResult = await query.NextAsync();
                 _logger.LogInformation($"{queryResult}");
 
                 foreach (EnrollmentGroup group in queryResult.Items)
                 {
-                    await EnumerateRegistrationsInGroup(querySpecification, group).ConfigureAwait(false);
+                    await EnumerateRegistrationsInGroup(querySpecification, group);
                 }
             }
         }
