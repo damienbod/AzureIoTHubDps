@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "7619d154-305d-40a1-8f4c-f7c17b096fa5": {
+      "ProjectGuid": "7619d154-305d-40a1-8f4c-f7c17b096fa5",
+      "DisplayName": "SimulateAzureIoTDevice",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
