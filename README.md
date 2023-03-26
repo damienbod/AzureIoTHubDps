@@ -1,8 +1,9 @@
 # Device provisioning service
 
-Provisioning X.509 Devices for Azure IoT Hub using .NET Core
+[![.NET](https://github.com/damienbod/AzureIoTHubDps/actions/workflows/dotnet.yml/badge.svg)](https://github.com/damienbod/AzureIoTHubDps/actions/workflows/dotnet.yml)
 
-https://damienbod.com/2020/02/20/provisioning-x-509-devices-for-azure-iot-hub-using-net-core/
+
+[Provisioning X.509 Devices for Azure IoT Hub using .NET Core](https://damienbod.com/2020/02/20/provisioning-x-509-devices-for-azure-iot-hub-using-net-core/)
 
 # Links
 
