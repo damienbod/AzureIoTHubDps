@@ -8,8 +8,12 @@
 User secrets:
 
 ```json
-
-TODO
+{
+  "ConnectionStrings": {
+    "DpsConnection": "--your-connectionstring--",
+    "IoTHubConnection": "--your-connectionstring--"
+  }
+}
 
 ```
 
