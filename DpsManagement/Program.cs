@@ -38,7 +38,7 @@ class Program
         //await CreateDeviceAsync("will4", dpsIntermediate1, "1234");
         //await CreateDeviceAsync("yes", dpsIntermediate1, "1234");
 
-        //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync().ConfigureAwait(false);
+        //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync();
 
         /// -- DISABLE / ENABLE IoT Hub Device
         //var ioTHubUpdateDevice = _sp.GetService<IoTHubUpdateDevice>();
