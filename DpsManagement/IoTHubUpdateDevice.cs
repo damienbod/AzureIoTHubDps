@@ -17,7 +17,6 @@ public class IoTHubUpdateDevice
         _logger = loggerFactory.CreateLogger<IoTHubUpdateDevice>();
         _registryManager = RegistryManager.CreateFromConnectionString(
             Configuration.GetConnectionString("IoTHubConnection"));
-
     }
 
     /// <summary>

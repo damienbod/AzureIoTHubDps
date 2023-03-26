@@ -24,10 +24,12 @@ public class DpsUpdateDevice
     {
         var groupEnrollment = await _provisioningServiceClient.GetEnrollmentGroupAsync(enrollmentGroupId);
 
-        if (groupEnrollment.ProvisioningStatus.Value != ProvisioningStatus.Disabled)
+        if (groupEnrollment != null && groupEnrollment.ProvisioningStatus != null 
+            && groupEnrollment.ProvisioningStatus.Value != ProvisioningStatus.Disabled)
         {
             groupEnrollment.ProvisioningStatus = ProvisioningStatus.Disabled;
             var update = await _provisioningServiceClient.CreateOrUpdateEnrollmentGroupAsync(groupEnrollment);
+            _logger.LogInformation("DisableEnrollmentGroupAsync update.ProvisioningStatus: ", update.ProvisioningStatus);
         }
     }
 
@@ -39,25 +41,16 @@ public class DpsUpdateDevice
         foreach (var devicestring in groupEnrollments.Items)
         {
             var enrollment = devicestring as EnrollmentGroup;
-            if (enrollment.EnrollmentGroupId == enrollmentGroupId)
+            if (enrollment != null && enrollment.EnrollmentGroupId == enrollmentGroupId)
             {
-                if (enrollment.ProvisioningStatus.Value != ProvisioningStatus.Enabled)
+                if (enrollment.ProvisioningStatus != null &&
+                    enrollment.ProvisioningStatus.Value != ProvisioningStatus.Enabled)
                 {
                     enrollment.ProvisioningStatus = ProvisioningStatus.Enabled;
                     var update = await _provisioningServiceClient.CreateOrUpdateEnrollmentGroupAsync(enrollment);
+                    _logger.LogInformation("EnableEnrollmentGroupAsync update.ProvisioningStatus: ", update.ProvisioningStatus);
                 }
             }
         }
-    }
-
-    public async Task DisableDeviceAsync(string deviceId)
-    {
-       
-
-    }
-
-    public async Task EnableDeviceAsync(string deviceId)
-    {
-      
     }
 }
