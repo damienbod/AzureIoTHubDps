@@ -5,14 +5,13 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace CertsVerifyCertificate;
 
-
 /// <summary>
 /// https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started
 /// </summary>
 class Program
 {
-    static string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-    static string pathToCerts = $"{directory}/../../../../Certs/";
+    static string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+    static string _pathToCerts = $"{_directory}/../../../../Certs/";
 
     static void Main(string[] args)
     {
@@ -21,10 +20,11 @@ class Program
             .BuildServiceProvider();
 
         var createClientServerAuthCerts = serviceProvider.GetService<CreateCertificatesClientServerAuth>();
-
         var importExportCertificate = serviceProvider.GetService<ImportExportCertificate>();
+        if (createClientServerAuthCerts == null) throw new ArgumentNullException(nameof(createClientServerAuthCerts));
+        if (importExportCertificate == null) throw new ArgumentNullException(nameof(importExportCertificate));
 
-        var root = new X509Certificate2($"{pathToCerts}dpsCa.pfx", "1234");
+        var root = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
 
         var verify = createClientServerAuthCerts.NewDeviceVerificationCertificate(
         "5FF0630C6EE1BADB9D1C783271051D3963B896B1C5753A9C", root);
