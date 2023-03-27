@@ -46,24 +46,24 @@ public class DpsEnrollmentGroup
                 new TwinCollection("{ }")
             )
         };
-        _logger.LogInformation($"{enrollmentGroup}");
-        _logger.LogInformation($"Adding new enrollmentGroup...");
+        _logger.LogInformation("{enrollmentGroup}", enrollmentGroup);
+        _logger.LogInformation("Adding new enrollmentGroup...");
 
         EnrollmentGroup enrollmentGroupResult = await _provisioningServiceClient
             .CreateOrUpdateEnrollmentGroupAsync(enrollmentGroup);
 
-        _logger.LogInformation($"EnrollmentGroup created with success.");
-        _logger.LogInformation($"{enrollmentGroupResult}");
+        _logger.LogInformation("EnrollmentGroup created with success.");
+        _logger.LogInformation("{enrollmentGroupResult}", enrollmentGroupResult);
     }
 
     public async Task EnumerateRegistrationsInGroup(QuerySpecification querySpecification, EnrollmentGroup group)
     {
-        _logger.LogInformation($"Creating a query for registrations within group '{group.EnrollmentGroupId}'...");
+        _logger.LogInformation("Creating a query for registrations within group '{groupEnrollmentGroupId}'...", group.EnrollmentGroupId);
         using (Query registrationQuery = _provisioningServiceClient.CreateEnrollmentGroupRegistrationStateQuery(querySpecification, group.EnrollmentGroupId))
         {
-            _logger.LogInformation($"Querying the next registrations within group '{group.EnrollmentGroupId}'...");
+            _logger.LogInformation("Querying the next registrations within group '{groupEnrollmentGroupId}'...", group.EnrollmentGroupId);
             QueryResult registrationQueryResult = await registrationQuery.NextAsync();
-            _logger.LogInformation($"{registrationQueryResult}");
+            _logger.LogInformation("{registrationQueryResult}", registrationQueryResult);
         }
     }
 
@@ -77,7 +77,7 @@ public class DpsEnrollmentGroup
             {
                 _logger.LogInformation("Querying the next enrollmentGroups...");
                 QueryResult queryResult = await query.NextAsync();
-                _logger.LogInformation($"{queryResult}");
+                _logger.LogInformation("{queryResult}", queryResult);
 
                 foreach (EnrollmentGroup group in queryResult.Items)
                 {

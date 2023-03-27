@@ -38,7 +38,7 @@ public class IoTHubUpdateDevice
             Type = AuthenticationType.CertificateAuthority
         };
         device = await _registryManager.UpdateDeviceAsync(device);
-        _logger.LogInformation($"iot hub device updated  {device}");
+        _logger.LogInformation("iot hub device updated  {device}", device);
     }
 
     public async Task DisableDeviceAsync(string deviceId)
@@ -46,7 +46,7 @@ public class IoTHubUpdateDevice
         var device = await _registryManager.GetDeviceAsync(deviceId);
         device.Status = DeviceStatus.Disabled;
         device = await _registryManager.UpdateDeviceAsync(device);
-        _logger.LogInformation($"iot hub device disabled  {device}");
+        _logger.LogInformation("iot hub device disabled  {device}", device);
     }
 
     public async Task EnableDeviceAsync(string deviceId)
@@ -54,7 +54,7 @@ public class IoTHubUpdateDevice
         var device = await _registryManager.GetDeviceAsync(deviceId);
         device.Status = DeviceStatus.Enabled;
         device = await _registryManager.UpdateDeviceAsync(device);
-        _logger.LogInformation($"iot hub device enabled  {device}");
+        _logger.LogInformation("iot hub device enabled  {device}", device);
     }
 
     //public async Task QueryDevice(string deviceId)

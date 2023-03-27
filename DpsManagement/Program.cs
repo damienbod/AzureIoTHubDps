@@ -1,5 +1,6 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
+using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,26 +20,42 @@ class Program
     {
         InitServices();
 
-        /// -- DPS Create Enrollment Group
-        //var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
-        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pem");
-        //await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
+        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
 
-        /// -- DPS create certificte, then enrollment group
-        var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
-        var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
+        #region Individual Enrollment
 
         /// -- DPS Create individual enrollment
-        //var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
-        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
-        //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
+        //var deviceId = "testdevice01";
+        //var dpsIndividualEnrollmentService = _sp.GetService<DpsIndividualEnrollment>();
+        //if (dpsIndividualEnrollmentService == null) throw new ArgumentNullException(nameof(dpsIndividualEnrollmentService));
+        
+        //var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}{deviceId}.pem");
+        //await dpsIndividualEnrollmentService.CreateIndividualEnrollment(deviceId, dpsEnrollmentPem);
 
-        /// -- Create certificate, register device to dps and create in iot hub
-        //var dpsIntermediate1 = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
-        //await CreateDeviceAsync("will4", dpsIntermediate1, "1234");
-        //await CreateDeviceAsync("yes", dpsIntermediate1, "1234");
+        //var certificateTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
+        //await CreateIndividualEnrollmentDeviceAsync(certificateTestdevice01);
 
-        //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync();
+        #endregion
+
+        #region Group Enrollment
+
+        /// -- DPS Create Enrollment Group
+        var dpsEnrollmentGroupService = _sp.GetService<DpsEnrollmentGroup>();
+        if (dpsEnrollmentGroupService == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroupService));
+
+        /// -- Use DPS create certificate to create enrollment group
+        /// -- This cert must be registered with the DPS in the certificates blade
+        var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsCa.pem");
+        var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
+
+        var commonNameAndGroupEnrollmentName = "engroup7";
+        await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
+
+        await CreateGroupEnrollmentDeviceAsync("engroup7-device-03", dpsCaCertificate, "1234");
+
+        await dpsEnrollmentGroupService.QueryEnrollmentGroupAsync();
+
+        #endregion
 
         /// -- DISABLE / ENABLE IoT Hub Device
         //var ioTHubUpdateDevice = _sp.GetService<IoTHubUpdateDevice>();
@@ -49,12 +66,29 @@ class Program
 
         /// -- DISABLE / ENABLE DPS EnrollmentGroup
         //var dpsUpdateDevice = _sp.GetService<DpsUpdateDevice>();
-        //await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate1");
-        //await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate1");
+        //await dpsUpdateDevice.DisableEnrollmentGroupAsync(commonNameAndGroupEnrollmentName);
+        //await dpsUpdateDevice.EnableEnrollmentGroupAsync(commonNameAndGroupEnrollmentName);
     }
 
-    private static async Task<X509Certificate2> CreateEnrollmentGroup(
-        string enrollmentGroup, X509Certificate2 parentCert)
+    private static async Task<DeviceRegistrationResult?> CreateIndividualEnrollmentDeviceAsync(
+        X509Certificate2 certificate)
+    {
+        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
+
+        var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
+        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>();
+        var iec = _sp.GetService<ImportExportCertificate>();
+
+        if (cc == null) throw new ArgumentNullException(nameof(cc));
+        if (dpsRegisterDevice == null) throw new ArgumentNullException(nameof(dpsRegisterDevice));
+        if (iec == null) throw new ArgumentNullException(nameof(iec));
+
+        var result = await dpsRegisterDevice.RegisterDeviceAsync(certificate, certificate);
+
+        return result;
+    }
+
+    private static async Task CreateEnrollmentGroup(string enrollmentGroup, X509Certificate2 groupCertificate)
     {
         if (_sp == null) throw new ArgumentNullException(nameof(_sp));
 
@@ -66,45 +100,40 @@ class Program
         if (dpsEnrollmentGroup == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroup));
         if (iec == null) throw new ArgumentNullException(nameof(iec));
 
-        var enrollmentGroupCert = cc.NewIntermediateChainedCertificate(
-           new DistinguishedName { CommonName = enrollmentGroup },
-           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
-           2, enrollmentGroup, parentCert);
-        enrollmentGroupCert.FriendlyName = $"{enrollmentGroup} certificate";
-
-        var enrollmentGroupPEM = iec.PemExportPublicKeyCertificate(enrollmentGroupCert);
-        var cert = iec.PemImportCertificate(enrollmentGroupPEM);
-
         await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(
-            enrollmentGroup, new X509Certificate2(cert));
-        return enrollmentGroupCert;
+            enrollmentGroup, new X509Certificate2(groupCertificate));
     }
 
-    private static async Task<X509Certificate2> CreateDeviceAsync(
-        string deviceId, X509Certificate2 parentCertificate, string password)
+    private static async Task<X509Certificate2> CreateGroupEnrollmentDeviceAsync(
+        string commonNameDeviceId, X509Certificate2 dpsGroupCertificate, string password)
     {
         if (_sp == null) throw new ArgumentNullException(nameof(_sp));
 
         var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
-        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>(); ;
+        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>();
         var iec = _sp.GetService<ImportExportCertificate>();
 
         if (cc == null) throw new ArgumentNullException(nameof(cc));
         if (dpsRegisterDevice == null) throw new ArgumentNullException(nameof(dpsRegisterDevice));
         if (iec == null) throw new ArgumentNullException(nameof(iec));
 
-        deviceId = deviceId.ToLower();
+        commonNameDeviceId = commonNameDeviceId.ToLower();
 
         var device = cc.NewDeviceChainedCertificate(
-            new DistinguishedName { CommonName = deviceId },
-            new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
-            deviceId, parentCertificate);
-        device.FriendlyName = $"IoT device {deviceId}";
+          new DistinguishedName { CommonName = $"{commonNameDeviceId}" },
+          new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
+          $"{commonNameDeviceId}", dpsGroupCertificate);
+        device.FriendlyName = $"IoT device {commonNameDeviceId}";
         
-        var deviceInPfxBytes = iec.ExportChainedCertificatePfx(password, device, parentCertificate);
+        var deviceInPfxBytes = iec.ExportChainedCertificatePfx(password, device, dpsGroupCertificate);
         var deviceCert = new X509Certificate2(deviceInPfxBytes, password);
 
-        await dpsRegisterDevice.RegisterDeviceAsync(deviceCert, parentCertificate);
+        await dpsRegisterDevice.RegisterDeviceAsync(deviceCert, dpsGroupCertificate);
+
+        // Save File to use in IoC device
+        File.WriteAllBytes($"{commonNameDeviceId}.pfx", deviceInPfxBytes);
+        var devicePEM = iec.PemExportPublicKeyCertificate(device);
+        File.WriteAllText($"{commonNameDeviceId}.pem", devicePEM);
 
         return device;
     }
