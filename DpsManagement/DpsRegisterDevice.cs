@@ -18,6 +18,10 @@ public class DpsRegisterDevice
         _logger = loggerFactory.CreateLogger<DpsRegisterDevice>();
     }
 
+    /// <summary>
+    /// transport exception if the Common Name "CN=" value within the device x.509 certificate does not match the Group Enrollment name within DPS.
+    /// https://github.com/Azure/azure-iot-sdk-c/blob/main/tools/CACertificates/CACertificateOverview.md
+    /// </summary>
     public async Task<DeviceRegistrationResult> RegisterDeviceAsync(
         X509Certificate2 deviceCertificate,
         X509Certificate2 enrollmentCertificate)
