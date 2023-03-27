@@ -20,10 +20,14 @@ class Program
     {
         InitServices();
 
+        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
+
         #region Individual Enrollment
 
         /// -- DPS Create individual enrollment
-        //var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
+        var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
+        if (dpsIndividualEnrollment == null) throw new ArgumentNullException(nameof(dpsIndividualEnrollment));
+        
         //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
         //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 

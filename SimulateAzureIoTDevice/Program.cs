@@ -3,14 +3,21 @@ using Microsoft.Azure.Devices.Client;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 
 namespace SimulateAzureIoTDevice;
 
 class Program
 {
+    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+    static readonly string _pathToCerts = $"{_directory}/../../../../Certs/";
+
+    private static readonly string deviceId = "testdevice01";
+    private static readonly string iotHubUrl = "damienbod-iothub.azure-devices.net";
+
     private const int TEMPERATURE_THRESHOLD = 30;
     private static readonly int MESSAGE_COUNT = 5;
-    private static readonly string deviceId = "TestDevice01";
     private static readonly Random rnd = new();
     private static float temperature;
     private static float humidity;
@@ -19,9 +26,9 @@ class Program
     {
         try
         {
-            var cert = new X509Certificate2(@"testDevice01.pfx", "1234");
-            var auth = new DeviceAuthenticationWithX509Certificate("TestDevice01", cert);
-            var deviceClient = DeviceClient.Create("damienbod.azure-devices.net", auth, TransportType.Http1);
+            var certTestdevice01 = new X509Certificate2($"{_pathToCerts}testdevice01.pfx", "1234");
+            var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
+            var deviceClient = DeviceClient.Create(iotHubUrl, auth, TransportType.Amqp);
 
             if (deviceClient == null)
             {

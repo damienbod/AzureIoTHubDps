@@ -23,15 +23,12 @@ public class DpsRegisterDevice
         X509Certificate2 enrollmentCertificate)
     {
         var scopeId = Configuration["ScopeId"];
-        //// The cert from the enrollment group is required for group registrations
-        //X509Certificate2 enrollmentCertificate = new X509Certificate2("dpsIntermediate1.pfx", "1234");
 
-        using (var security = new SecurityProviderX509Certificate(deviceCertificate,
-         new X509Certificate2Collection(enrollmentCertificate)))
+        using (var security = new SecurityProviderX509Certificate(deviceCertificate, new X509Certificate2Collection(enrollmentCertificate)))
 
         // To optimize for size, reference only the protocols used by your application.
-        //using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
-        using (var transport = new ProvisioningTransportHandlerHttp())
+        using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
+        //using (var transport = new ProvisioningTransportHandlerHttp())
         //using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.TcpOnly))
         // using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.WebSocketOnly))
         {
