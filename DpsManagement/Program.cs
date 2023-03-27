@@ -33,7 +33,7 @@ class Program
         //await dpsIndividualEnrollmentService.CreateIndividualEnrollment(deviceId, dpsEnrollmentPem);
 
         //var certificateTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
-        //await CreateIndividualEnrollmentDeviceAsync(deviceId, certificateTestdevice01);
+        //await CreateIndividualEnrollmentDeviceAsync(certificateTestdevice01);
 
         #endregion
 
@@ -51,7 +51,7 @@ class Program
         //var commonNameAndGroupEnrollmentName = "engroup7";
         //await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
 
-        await CreateGroupEnrollmentDeviceAsync("mad", dpsCaCertificate, "1234");
+        await CreateGroupEnrollmentDeviceAsync("engroup7-device-03", dpsCaCertificate, "1234");
 
         await dpsEnrollmentGroupService.QueryEnrollmentGroupAsync();
 
@@ -66,12 +66,12 @@ class Program
 
         /// -- DISABLE / ENABLE DPS EnrollmentGroup
         //var dpsUpdateDevice = _sp.GetService<DpsUpdateDevice>();
-        //await dpsUpdateDevice.DisableEnrollmentGroupAsync("dpsIntermediate1");
-        //await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate1");
+        //await dpsUpdateDevice.DisableEnrollmentGroupAsync(commonNameAndGroupEnrollmentName);
+        //await dpsUpdateDevice.EnableEnrollmentGroupAsync(commonNameAndGroupEnrollmentName);
     }
 
     private static async Task<DeviceRegistrationResult?> CreateIndividualEnrollmentDeviceAsync(
-     string deviceId, X509Certificate2 certificate)
+        X509Certificate2 certificate)
     {
         if (_sp == null) throw new ArgumentNullException(nameof(_sp));
 
