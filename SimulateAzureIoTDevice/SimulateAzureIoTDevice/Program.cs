@@ -21,7 +21,7 @@ class Program
         {
             var cert = new X509Certificate2(@"testDevice01.pfx", "1234");
             var auth = new DeviceAuthenticationWithX509Certificate("TestDevice01", cert);
-            var deviceClient = DeviceClient.Create("damienbod.azure-devices.net", auth, TransportType.Amqp_Tcp_Only);
+            var deviceClient = DeviceClient.Create("damienbod.azure-devices.net", auth, TransportType.Http1);
 
             if (deviceClient == null)
             {

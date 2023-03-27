@@ -35,8 +35,8 @@ public class DpsRegisterDevice
         //using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.TcpOnly))
         // using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.WebSocketOnly))
         {
-            var client = ProvisioningDeviceClient.Create(
-                "global.azure-devices-provisioning.net", scopeId, security, transport);
+            var client = ProvisioningDeviceClient.Create("global.azure-devices-provisioning.net", scopeId, security, transport);
+
             var result = await client.RegisterAsync();
             _logger.LogInformation("DPS client created: {result}", result);
             return result;
