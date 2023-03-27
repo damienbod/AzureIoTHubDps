@@ -40,19 +40,21 @@ class Program
         #region Group Enrollment
 
         /// -- DPS Create Enrollment Group
-        //var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
-        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pem");
-        //await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsEnrollmentCertificate);
+        //var dpsEnrollmentGroupService = _sp.GetService<DpsEnrollmentGroup>();
+        //if (dpsEnrollmentGroupService == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroupService));
 
-        /// -- DPS create certificte, then enrollment group
+        //var dpsGroupEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pem");
+        //await dpsEnrollmentGroupService.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsGroupEnrollmentPem);
+
+        ///// --DPS create certificate, then enrollment group
         //var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
-        //var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
+        //var cert = await CreateEnrollmentGroup("engroup", dpsCaCertificate);
 
-        /// -- Create certificate, register device to dps and create in iot hub
+        ///// --Create certificate, register device to dps and create in iot hub
         //var dpsIntermediate1 = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
-        //await CreateGroupEnrollmentDeviceAsync("will4", dpsIntermediate1, "1234");
+        //await CreateGroupEnrollmentDeviceAsync("groupddevice01", dpsIntermediate1, "1234");
 
-        //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync();
+        //await dpsEnrollmentGroupService.QueryEnrollmentGroupAsync();
 
         #endregion
 
