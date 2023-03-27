@@ -2,9 +2,7 @@
 
 [![.NET](https://github.com/damienbod/AzureIoTHubDps/actions/workflows/dotnet.yml/badge.svg)](https://github.com/damienbod/AzureIoTHubDps/actions/workflows/dotnet.yml)
 
-
 [Provisioning X.509 Devices for Azure IoT Hub using .NET Core](https://damienbod.com/2020/02/20/provisioning-x-509-devices-for-azure-iot-hub-using-net-core/)
-
 
 ## User secrets:
 
@@ -21,7 +19,11 @@ You can find the DPS/IoT Hub Connection Strings in the portal:
 }
 ```
 
-# Links
+## History
+
+2023-03-27 Updated to .NET 7, fix group and individual enrollments
+
+## Links
 
 https://github.com/Azure/azure-iot-sdk-csharp
 
