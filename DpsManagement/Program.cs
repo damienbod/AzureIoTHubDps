@@ -43,13 +43,13 @@ class Program
         var dpsEnrollmentGroupService = _sp.GetService<DpsEnrollmentGroup>();
         if (dpsEnrollmentGroupService == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroupService));
 
-        /// --DPS create certificate, then enrollment group
-        /// This cert must be registered with the DPS in the certificates blade
+        /// -- Use DPS create certificate to create enrollment group
+        /// -- This cert must be registered with the DPS in the certificates blade
         var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsCa.pem");
         var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
 
-        //var commonNameAndGroupEnrollmentName = "engroup7";
-        //await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
+        var commonNameAndGroupEnrollmentName = "engroup7";
+        await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
 
         await CreateGroupEnrollmentDeviceAsync("engroup7-device-03", dpsCaCertificate, "1234");
 
