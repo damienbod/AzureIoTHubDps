@@ -13,7 +13,7 @@ class Program
     static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
     static readonly string _pathToCerts = $"{_directory}/../../../../Certs/";
 
-    // DEfine the device
+    // Define the device
     private static readonly string deviceId = "testdevice01";
     private static readonly string iotHubUrl = "damienbod-iothub.azure-devices.net";
     private static readonly TransportType transportType = TransportType.Amqp;
@@ -28,7 +28,7 @@ class Program
     {
         try
         {
-            var certTestdevice01 = new X509Certificate2($"{_pathToCerts}testdevice01.pfx", "1234");
+            var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
             var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
 

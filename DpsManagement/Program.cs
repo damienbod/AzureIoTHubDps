@@ -25,14 +25,15 @@ class Program
         #region Individual Enrollment
 
         /// -- DPS Create individual enrollment
+        var deviceId = "testdevice01";
         var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
         if (dpsIndividualEnrollment == null) throw new ArgumentNullException(nameof(dpsIndividualEnrollment));
         
-        var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
-        await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
+        var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}{deviceId}.pem");
+        await dpsIndividualEnrollment.CreateIndividualEnrollment(deviceId, dpsEnrollmentCertificate);
 
-        var dpsIndividualEnrollmentTestdevice01 = new X509Certificate2($"{_pathToCerts}testdevice01.pfx", "1234");
-        await CreateIndividualEnrollmentDeviceAsync("testdevice01", dpsIndividualEnrollmentTestdevice01, "1234");
+        var dpsIndividualEnrollmentTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
+        await CreateIndividualEnrollmentDeviceAsync(deviceId, dpsIndividualEnrollmentTestdevice01);
 
         #endregion
 
@@ -96,7 +97,7 @@ class Program
     }
 
     private static async Task<DeviceRegistrationResult?> CreateIndividualEnrollmentDeviceAsync(
-     string deviceId, X509Certificate2 certificate, string password)
+     string deviceId, X509Certificate2 certificate)
     {
         if (_sp == null) throw new ArgumentNullException(nameof(_sp));
 
