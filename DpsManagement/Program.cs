@@ -1,6 +1,5 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
-using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,14 +44,14 @@ class Program
         if (dpsEnrollmentGroupService == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroupService));
 
         /// --DPS create certificate, then enrollment group
+        /// This cert must be registered with the DPS in the certificates blade
         var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsCa.pem");
         var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
 
-        var commonNameAndGroupEnrollmentName = "engroup7";
-        await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
+        //var commonNameAndGroupEnrollmentName = "engroup7";
+        //await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
 
-        //  Common Name "CN=" value within the device x.509 certificate MUST match the Group Enrollment name within DPS.
-        await CreateGroupEnrollmentDeviceAsync(commonNameAndGroupEnrollmentName, dpsCaCertificate, "1234");
+        await CreateGroupEnrollmentDeviceAsync("mad", dpsCaCertificate, "1234");
 
         await dpsEnrollmentGroupService.QueryEnrollmentGroupAsync();
 
@@ -121,17 +120,20 @@ class Program
         commonNameDeviceId = commonNameDeviceId.ToLower();
 
         var device = cc.NewDeviceChainedCertificate(
-          new DistinguishedName { CommonName = commonNameDeviceId },
+          new DistinguishedName { CommonName = $"{commonNameDeviceId}" },
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
-          commonNameDeviceId, dpsGroupCertificate);
+          $"{commonNameDeviceId}", dpsGroupCertificate);
         device.FriendlyName = $"IoT device {commonNameDeviceId}";
         
         var deviceInPfxBytes = iec.ExportChainedCertificatePfx(password, device, dpsGroupCertificate);
         var deviceCert = new X509Certificate2(deviceInPfxBytes, password);
 
-        //var deviceExported = new X509Certificate2(device.Export(X509ContentType.Pfx));
-        
         await dpsRegisterDevice.RegisterDeviceAsync(deviceCert, dpsGroupCertificate);
+
+        // Save File to use in IoC device
+        File.WriteAllBytes($"{commonNameDeviceId}.pfx", deviceInPfxBytes);
+        var devicePEM = iec.PemExportPublicKeyCertificate(device);
+        File.WriteAllText($"{commonNameDeviceId}.pem", devicePEM);
 
         return device;
     }
