@@ -30,9 +30,9 @@ public class DpsRegisterDevice
          new X509Certificate2Collection(enrollmentCertificate)))
 
         // To optimize for size, reference only the protocols used by your application.
-        using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
-        // using (var transport = new ProvisioningTransportHandlerHttp())
-        // using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.TcpOnly))
+        //using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
+        using (var transport = new ProvisioningTransportHandlerHttp())
+        //using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.TcpOnly))
         // using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.WebSocketOnly))
         {
             var client = ProvisioningDeviceClient.Create(

@@ -1,5 +1,6 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
+using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,20 @@ class Program
     {
         InitServices();
 
+        #region Individual Enrollment
+
+        /// -- DPS Create individual enrollment
+        //var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
+        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
+        //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
+
+        var dpsIndividualEnrollmentTestdevice01 = new X509Certificate2($"{_pathToCerts}testdevice01.pfx", "1234");
+        await CreateIndividualEnrollmentDeviceAsync("testdevice01", dpsIndividualEnrollmentTestdevice01, "1234");
+
+        #endregion
+
+        #region Group Enrollment
+
         /// -- DPS Create Enrollment Group
         //var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
         //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pem");
@@ -28,17 +43,13 @@ class Program
         //var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
         //var cert = await CreateEnrollmentGroup("engroup2", dpsCaCertificate);
 
-        /// -- DPS Create individual enrollment
-        var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
-        var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
-        await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
-
         /// -- Create certificate, register device to dps and create in iot hub
         //var dpsIntermediate1 = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
-        //await CreateDeviceAsync("will4", dpsIntermediate1, "1234");
-        //await CreateDeviceAsync("yes", dpsIntermediate1, "1234");
+        //await CreateGroupEnrollmentDeviceAsync("will4", dpsIntermediate1, "1234");
 
         //await dpsEnrollmentGroup.QueryEnrollmentGroupAsync();
+
+        #endregion
 
         /// -- DISABLE / ENABLE IoT Hub Device
         //var ioTHubUpdateDevice = _sp.GetService<IoTHubUpdateDevice>();
@@ -80,13 +91,33 @@ class Program
         return enrollmentGroupCert;
     }
 
-    private static async Task<X509Certificate2> CreateDeviceAsync(
+    private static async Task<DeviceRegistrationResult?> CreateIndividualEnrollmentDeviceAsync(
+     string deviceId, X509Certificate2 certificate, string password)
+    {
+        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
+
+        var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
+        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>();
+        var iec = _sp.GetService<ImportExportCertificate>();
+
+        if (cc == null) throw new ArgumentNullException(nameof(cc));
+        if (dpsRegisterDevice == null) throw new ArgumentNullException(nameof(dpsRegisterDevice));
+        if (iec == null) throw new ArgumentNullException(nameof(iec));
+
+        deviceId = deviceId.ToLower();
+
+        var result = await dpsRegisterDevice.RegisterDeviceAsync(certificate, certificate);
+
+        return result;
+    }
+
+    private static async Task<X509Certificate2> CreateGroupEnrollmentDeviceAsync(
         string deviceId, X509Certificate2 parentCertificate, string password)
     {
         if (_sp == null) throw new ArgumentNullException(nameof(_sp));
 
         var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
-        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>(); ;
+        var dpsRegisterDevice = _sp.GetService<DpsRegisterDevice>();
         var iec = _sp.GetService<ImportExportCertificate>();
 
         if (cc == null) throw new ArgumentNullException(nameof(cc));
