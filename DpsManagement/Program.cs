@@ -28,8 +28,8 @@ class Program
         var dpsIndividualEnrollment = _sp.GetService<DpsIndividualEnrollment>();
         if (dpsIndividualEnrollment == null) throw new ArgumentNullException(nameof(dpsIndividualEnrollment));
         
-        //var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
-        //await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
+        var dpsEnrollmentCertificate = new X509Certificate2($"{_pathToCerts}testdevice01.pem");
+        await dpsIndividualEnrollment.CreateIndividualEnrollment("testdevice01", dpsEnrollmentCertificate);
 
         var dpsIndividualEnrollmentTestdevice01 = new X509Certificate2($"{_pathToCerts}testdevice01.pfx", "1234");
         await CreateIndividualEnrollmentDeviceAsync("testdevice01", dpsIndividualEnrollmentTestdevice01, "1234");
