@@ -26,14 +26,14 @@ class Program
         #region Individual Enrollment
 
         /// -- DPS Create individual enrollment
-        var deviceId = "testdevice01";
-        var dpsIndividualEnrollmentService = _sp.GetService<DpsIndividualEnrollment>();
+        //var deviceId = "testdevice01";
+        //var dpsIndividualEnrollmentService = _sp.GetService<DpsIndividualEnrollment>();
         //if (dpsIndividualEnrollmentService == null) throw new ArgumentNullException(nameof(dpsIndividualEnrollmentService));
         
-        var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}{deviceId}.pem");
+        //var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}{deviceId}.pem");
         //await dpsIndividualEnrollmentService.CreateIndividualEnrollment(deviceId, dpsEnrollmentPem);
 
-        var certificateTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
+        //var certificateTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
         //await CreateIndividualEnrollmentDeviceAsync(deviceId, certificateTestdevice01);
 
         #endregion
@@ -44,21 +44,15 @@ class Program
         var dpsEnrollmentGroupService = _sp.GetService<DpsEnrollmentGroup>();
         if (dpsEnrollmentGroupService == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroupService));
 
-        //var dpsGroupEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pem");
-        //await dpsEnrollmentGroupService.CreateDpsEnrollmentGroupAsync("dpsIntermediate1", dpsGroupEnrollmentPem);
-
         /// --DPS create certificate, then enrollment group
+        var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsCa.pem");
         var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
 
-        var commonNameAndGroupEnrollmentName = "engroup4";
-        var grouprEnrollmentCertificate = await CreateEnrollmentGroupAndNewDeviceCert(commonNameAndGroupEnrollmentName, dpsCaCertificate);
+        var commonNameAndGroupEnrollmentName = "engroup7";
+        await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
 
         //  Common Name "CN=" value within the device x.509 certificate MUST match the Group Enrollment name within DPS.
-        await CreateGroupEnrollmentDeviceAsync(commonNameAndGroupEnrollmentName, grouprEnrollmentCertificate, "1234");
-
-        /// --Create certificate, register device to dps and create in iot hub
-        //var dpsIntermediate1Certificate = new X509Certificate2($"{_pathToCerts}dpsIntermediate1.pfx", "1234");
-        //await CreateGroupEnrollmentDeviceAsync("groupddevice01-intermediate1", dpsIntermediate1Certificate, "1234");
+        await CreateGroupEnrollmentDeviceAsync(commonNameAndGroupEnrollmentName, dpsCaCertificate, "1234");
 
         await dpsEnrollmentGroupService.QueryEnrollmentGroupAsync();
 
@@ -77,40 +71,6 @@ class Program
         //await dpsUpdateDevice.EnableEnrollmentGroupAsync("dpsIntermediate1");
     }
 
-    private static async Task<X509Certificate2> CreateEnrollmentGroupAndNewDeviceCert(
-        string enrollmentGroup, X509Certificate2 parentCert)
-    {
-        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
-
-        var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
-        var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
-        var iec = _sp.GetService<ImportExportCertificate>();
-
-        if (cc == null) throw new ArgumentNullException(nameof(cc));
-        if (dpsEnrollmentGroup == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroup));
-        if (iec == null) throw new ArgumentNullException(nameof(iec));
-
-        var enrollmentGroupCert = cc.NewIntermediateChainedCertificate(
-           new DistinguishedName { CommonName = enrollmentGroup },
-           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
-           2, enrollmentGroup, parentCert);
-        enrollmentGroupCert.FriendlyName = $"{enrollmentGroup} certificate";
-
-        var enrollmentGroupPEM = iec.PemExportPublicKeyCertificate(enrollmentGroupCert);
-        var cert = iec.PemImportCertificate(enrollmentGroupPEM);
-
-        await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(
-            enrollmentGroup, new X509Certificate2(cert));
-
-        var deviceInPfxBytes = iec.ExportChainedCertificatePfx("1234", enrollmentGroupCert, parentCert);
-        File.WriteAllBytes($"{enrollmentGroup}.pfx", deviceInPfxBytes);
-
-        var devicePEM = iec.PemExportPublicKeyCertificate(enrollmentGroupCert);
-        File.WriteAllText($"{enrollmentGroup}.pem", devicePEM);
-
-        return enrollmentGroupCert;
-    }
-
     private static async Task<DeviceRegistrationResult?> CreateIndividualEnrollmentDeviceAsync(
      string deviceId, X509Certificate2 certificate)
     {
@@ -124,11 +84,25 @@ class Program
         if (dpsRegisterDevice == null) throw new ArgumentNullException(nameof(dpsRegisterDevice));
         if (iec == null) throw new ArgumentNullException(nameof(iec));
 
-        deviceId = deviceId.ToLower();
-
         var result = await dpsRegisterDevice.RegisterDeviceAsync(certificate, certificate);
 
         return result;
+    }
+
+    private static async Task CreateEnrollmentGroup(string enrollmentGroup, X509Certificate2 groupCertificate)
+    {
+        if (_sp == null) throw new ArgumentNullException(nameof(_sp));
+
+        var cc = _sp.GetService<CreateCertificatesClientServerAuth>();
+        var dpsEnrollmentGroup = _sp.GetService<DpsEnrollmentGroup>();
+        var iec = _sp.GetService<ImportExportCertificate>();
+
+        if (cc == null) throw new ArgumentNullException(nameof(cc));
+        if (dpsEnrollmentGroup == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroup));
+        if (iec == null) throw new ArgumentNullException(nameof(iec));
+
+        await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(
+            enrollmentGroup, new X509Certificate2(groupCertificate));
     }
 
     private static async Task<X509Certificate2> CreateGroupEnrollmentDeviceAsync(
@@ -157,7 +131,7 @@ class Program
 
         //var deviceExported = new X509Certificate2(device.Export(X509ContentType.Pfx));
         
-        await dpsRegisterDevice.RegisterDeviceAsync(deviceCert, deviceCert);
+        await dpsRegisterDevice.RegisterDeviceAsync(deviceCert, dpsGroupCertificate);
 
         return device;
     }
