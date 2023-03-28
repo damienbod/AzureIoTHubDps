@@ -48,10 +48,11 @@ class Program
         var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsCa.pem");
         var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
 
-        var commonNameAndGroupEnrollmentName = "engroup7";
+        var commonNameAndGroupEnrollmentName = "enrollment-group";
         await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
 
-        await CreateGroupEnrollmentDeviceAsync("engroup7-device-03", dpsCaCertificate, "1234");
+        await CreateGroupEnrollmentDeviceAsync("enrollment-group-device-01", dpsCaCertificate, "1234");
+        await CreateGroupEnrollmentDeviceAsync("enrollment-group-device-02", dpsCaCertificate, "1234");
 
         await dpsEnrollmentGroupService.QueryEnrollmentGroupAsync();
 
