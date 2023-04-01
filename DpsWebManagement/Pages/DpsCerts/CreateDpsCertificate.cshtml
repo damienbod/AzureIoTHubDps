@@ -3,21 +3,18 @@
 @{
 }
 
-
 <form asp-page="CreateDpsCertificateModel" method="post">
-
-    <div class="form-group">
-        <label for="Message">Certificate Name:</label>
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Certificate Name:</label>
         <input class="form-control" type="text" value="@Model.Name" id="Name" name="Name"/>
         <span asp-validation-for="Name" style="color:red"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary" style="width:100%">Create</button>
-
+    <button type="submit" class="btn btn-primary">Create DPS certificate</button>
 </form>
 
+<br />
 
-<br />
-<br />
+<p>The certificate can be uploaded to the Azure IoT Hub Device Provisioning Services!</p>
 
 <textarea class="form-control" rows="5" id="Message" name="Message" readonly>@Model.Message</textarea>
