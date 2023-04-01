@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Authentication;
+using DpsWebManagement.Providers;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 
@@ -14,6 +14,17 @@ namespace DpsWebManagement
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            builder.Services.AddDbContext<DpsDbContext>(options =>
+                options.UseSqlServer(connection)
+            );
+
+            builder.Services.AddCertificateManager();
+            builder.Services.AddTransient<DpsRegisterDevice>();
+            builder.Services.AddTransient<DpsEnrollmentGroup>();
+            builder.Services.AddTransient<DpsUpdateDevice>();
+
             builder.Services.AddDistributedMemoryCache();
 
             builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
@@ -23,11 +34,16 @@ namespace DpsWebManagement
 
             builder.Services.AddAuthorization(options =>
             {
-                // By default, all incoming requests will be authorized according to the default policy.
                 options.FallbackPolicy = options.DefaultPolicy;
             });
-            builder.Services.AddRazorPages()
-                .AddMicrosoftIdentityUI();
+
+            builder.Services.AddRazorPages().AddMvcOptions(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).AddMicrosoftIdentityUI();
 
             var app = builder.Build();
 
