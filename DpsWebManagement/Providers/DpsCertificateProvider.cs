@@ -1,5 +1,7 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
+using DpsWebManagement.Providers.Model;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
 namespace DpsWebManagement.Providers;
@@ -50,6 +52,16 @@ public class DpsCertificateProvider
         await _dpsDbContext.SaveChangesAsync();
 
         return publicKeyPem;
+    }
+
+    public async Task<List<DpsCertificate>> GetDpsCertificatesAsync()
+    {
+        return await _dpsDbContext.DpsCertificates.ToListAsync();
+    }
+
+    public async Task<DpsCertificate?> GetDpsCertificatesAsync(int id)
+    {
+        return await _dpsDbContext.DpsCertificates.FirstOrDefaultAsync(item => item.Id == id);
     }
 
     private string GetEncodedRandomString(int length)
