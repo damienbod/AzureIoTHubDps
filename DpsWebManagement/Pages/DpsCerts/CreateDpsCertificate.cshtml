@@ -2,3 +2,22 @@
 @model DpsWebManagement.Pages.DpsCerts.CreateDpsCertificateModel
 @{
 }
+
+
+<form asp-page="CreateDpsCertificateModel" method="post">
+
+    <div class="form-group">
+        <label for="Message">Certificate Name:</label>
+        <input class="form-control" type="text" value="@Model.Name" id="Name" name="Name"/>
+        <span asp-validation-for="Name" style="color:red"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%">Create</button>
+
+</form>
+
+
+<br />
+<br />
+
+<textarea class="form-control" rows="5" id="Message" name="Message" readonly>@Model.Message</textarea>
