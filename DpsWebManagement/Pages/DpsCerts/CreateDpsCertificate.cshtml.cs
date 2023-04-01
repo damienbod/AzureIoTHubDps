@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace DpsWebManagement.Pages
+namespace DpsWebManagement.Pages.DpsCerts
 {
-    public class CreateDpsEnrollmentGroupModel : PageModel
+    public class CreateDpsCertificateModel : PageModel
     {
         public void OnGet()
         {
