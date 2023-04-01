@@ -19,6 +19,13 @@ You can find the DPS/IoT Hub Connection Strings in the portal:
 }
 ```
 
+## Migrations DpsWebManagement
+
+```
+Add-Migration "init"
+
+Update-Database
+
 ## History
 
 2023-03-27 Updated to .NET 7, fix group and individual enrollments
