@@ -25,6 +25,8 @@ namespace DpsWebManagement
             builder.Services.AddTransient<DpsEnrollmentGroup>();
             builder.Services.AddTransient<DpsUpdateDevice>();
 
+            builder.Services.AddScoped<DpsCertificateProvider>();
+
             builder.Services.AddDistributedMemoryCache();
 
             builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)

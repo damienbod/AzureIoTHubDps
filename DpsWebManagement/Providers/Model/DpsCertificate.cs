@@ -10,6 +10,10 @@ public class DpsCertificate
 
     public string? PemPublicKey { get; set; }
 
+    // This should be encrypted or not saved all all here! 
+    public string? Password { get; set; }
+
     public ICollection<DpsEnrollmentGroup> DpsEnrollmentGroups { get; } = new List<DpsEnrollmentGroup>();
+  
 }
 

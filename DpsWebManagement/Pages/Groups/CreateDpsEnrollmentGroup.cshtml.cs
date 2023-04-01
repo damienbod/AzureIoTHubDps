@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace DpsWebManagement.Pages.Groups
+namespace DpsWebManagement.Pages.Groups;
+
+public class CreateDpsEnrollmentGroupModel : PageModel
 {
-    public class CreateDpsEnrollmentGroupModel : PageModel
+    public void OnGet()
     {
-        public void OnGet()
-        {
-        }
     }
 }
