@@ -1,6 +1,6 @@
 ﻿namespace DpsWebManagement.Providers.Model;
 
-public class DpsEnrollmentGroupEntity
+public class DpsCertificateEntity
 {
     public int Id { get; set; }
 
@@ -9,8 +9,5 @@ public class DpsEnrollmentGroupEntity
     public string? PemPrivateKey { get; set; }
 
     public string? PemPublicKey { get; set; }
-
-    public ICollection<DeviceEntity> Devices { get; } = new List<DeviceEntity>();
-
-    
 }
+
