@@ -1,7 +1,7 @@
 ﻿
 namespace DpsWebManagement.Providers.Model;
 
-public class DeviceEntity
+public class DpsEnrollmentDevice
 {
     public int Id { get; set; }
 
@@ -13,6 +13,6 @@ public class DeviceEntity
 
     public int DpsEnrollmentGroupId { get; set; }
 
-    public DpsEnrollmentGroupEntity DpsEnrollmentGroup { get; set; } = new();
+    public DpsEnrollmentGroup DpsEnrollmentGroup { get; set; } = new();
 }
 

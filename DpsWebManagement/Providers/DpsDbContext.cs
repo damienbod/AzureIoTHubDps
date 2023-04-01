@@ -11,18 +11,24 @@ public class DpsDbContext : DbContext
     {
     }
 
-    public DbSet<DeviceEntity> Devices => Set<DeviceEntity>();
-    public DbSet<DpsEnrollmentGroupEntity> DpsEnrollmentGroups => Set<DpsEnrollmentGroupEntity>();
-    public DbSet<DpsCertificateEntity> DpsCertificates => Set<DpsCertificateEntity>();
+    public DbSet<DpsEnrollmentDevice> DpsEnrollmentDevices => Set<DpsEnrollmentDevice>();
+    public DbSet<Model.DpsEnrollmentGroup> DpsEnrollmentGroups => base.Set<Model.DpsEnrollmentGroup>();
+    public DbSet<DpsCertificate> DpsCertificates => Set<DpsCertificate>();
   
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<DeviceEntity>().HasKey(m => m.Id);
-        builder.Entity<DpsEnrollmentGroupEntity>().HasKey(m => m.Id);
-        builder.Entity<DpsCertificateEntity>().HasKey(m => m.Id);
+        builder.Entity<DpsEnrollmentDevice>().HasKey(m => m.Id);
+        builder.Entity<Model.DpsEnrollmentGroup>().HasKey(m => m.Id);
+        builder.Entity<DpsCertificate>().HasKey(m => m.Id);
 
-        builder.Entity<DpsEnrollmentGroupEntity>()
-           .HasMany(e => e.Devices)
+        builder.Entity<Model.DpsCertificate>()
+          .HasMany(e => e.DpsEnrollmentGroups)
+          .WithOne(e => e.DpsCertificate)
+          .HasForeignKey(e => e.DpsCertificateId)
+          .HasPrincipalKey(e => e.Id);
+
+        builder.Entity<Model.DpsEnrollmentGroup>()
+           .HasMany(e => e.DpsEnrollmentDevices)
            .WithOne(e => e.DpsEnrollmentGroup)
            .HasForeignKey(e => e.DpsEnrollmentGroupId)
            .HasPrincipalKey(e => e.Id);
