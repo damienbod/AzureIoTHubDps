@@ -12,6 +12,9 @@ public class DpsCertificatesModel : PageModel
 
     public List<CertificatesModel> Certificates { get; set; } = new();
 
+    [BindProperty]
+    public int? Id { get; set; }
+
     public DpsCertificatesModel(DpsCertificateProvider dpsCertificateProvider)
     {
         _dpsCertificateProvider = dpsCertificateProvider;
