@@ -19,10 +19,9 @@ public class DpsCertificateProvider
         _createCertificatesClientServerAuth = createCertificatesClientServerAuth;
         _importExportCertificate = importExportCertificate;
         _dpsDbContext = dpsDbContext;
-
     }
 
-    public async Task<string> CreateCertificateForDpsAsync(string certName)
+    public async Task<(string PublicPem, int Id)> CreateCertificateForDpsAsync(string certName)
     {
         var password = GetEncodedRandomString(30);
         var dpsCertificate = _createCertificatesClientServerAuth.NewRootCertificate(
@@ -41,17 +40,19 @@ public class DpsCertificateProvider
         //var dpsCaPEM = _importExportCertificate.PemExportPublicKeyCertificate(dpsCertificate);
         //File.WriteAllText($"{certName}.pem", dpsCaPEM);
 
-        _dpsDbContext.DpsCertificates.Add(new Model.DpsCertificate
+        var item = new Model.DpsCertificate
         {
             Name = certName,
             PemPrivateKey = privateKeyPem,
             PemPublicKey = publicKeyPem,
             Password = password
-        });
+        };
+
+        _dpsDbContext.DpsCertificates.Add(item);
 
         await _dpsDbContext.SaveChangesAsync();
 
-        return publicKeyPem;
+        return (publicKeyPem, item.Id);
     }
 
     public async Task<List<DpsCertificate>> GetDpsCertificatesAsync()

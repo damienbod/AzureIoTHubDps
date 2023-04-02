@@ -17,4 +17,12 @@
 
 <p>The certificate can be uploaded to the Azure IoT Hub Device Provisioning Services!</p>
 
-<textarea class="form-control" rows="5" id="Message" name="Message" readonly>@Model.Message</textarea>
+@if (Model.Id != null)
+{
+    <form action="/api/FileDownload/DpsCertificatePem" method="post">
+        <input type="hidden" value="@Model.Id" id="Id" name="Id" />
+        <button type="submit" class="btn btn-link">download</button>
+    </form> 
+
+    <textarea class="form-control" rows="5" id="Message" name="Message" readonly>@Model.Message</textarea>
+}

@@ -30,7 +30,7 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    <form action="/api/FileDownload" method="post">
+                    <form action="/api/FileDownload/DpsCertificatePem" method="post">
                         <input type="hidden" value="@item.Id" id="Id" name="Id" />
                         <button type="submit" class="btn btn-link">download</button>
                     </form>   

@@ -13,6 +13,9 @@ public class CreateDpsCertificateModel : PageModel
     public string? Message { get; set; }
 
     [BindProperty]
+    public int? Id { get; set; }
+
+    [BindProperty]
     [Required]
     public string Name { get; set; } = string.Empty;
 
@@ -33,10 +36,10 @@ public class CreateDpsCertificateModel : PageModel
             return OnGet();
         }
 
-        var publicKeyPem = await _dpsCertificateProvider.CreateCertificateForDpsAsync(Name);
+        var result = await _dpsCertificateProvider.CreateCertificateForDpsAsync(Name);
 
-        Message = $"{publicKeyPem}";
-
+        Message = $"{result.PublicPem}";
+        Id = result.Id;
         return OnGet();
     }
 }
