@@ -9,6 +9,7 @@ namespace DpsWebManagement.Pages.Groups;
 public class CreateDpsEnrollmentGroupModel : PageModel
 {
     private readonly DpsCertificateProvider _dpsCertificateProvider;
+    private readonly DpsEnrollmentGroup _dpsEnrollmentGroup;
 
     [BindProperty]
     public string? Message { get; set; }
@@ -23,9 +24,11 @@ public class CreateDpsEnrollmentGroupModel : PageModel
 
     public List<SelectListItem> DpsCertificates { get; set; } = new List<SelectListItem>();
 
-    public CreateDpsEnrollmentGroupModel(DpsCertificateProvider dpsCertificateProvider)
+    public CreateDpsEnrollmentGroupModel(DpsCertificateProvider dpsCertificateProvider,
+        DpsEnrollmentGroup dpsEnrollmentGroup)
     {
         _dpsCertificateProvider = dpsCertificateProvider;
+        _dpsEnrollmentGroup = dpsEnrollmentGroup;
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -42,8 +45,8 @@ public class CreateDpsEnrollmentGroupModel : PageModel
             return await OnGetAsync();
         }
 
-        //Message = $"{result.PublicPem}";
-        //Id = result.Id;
+        var result = await _dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(Name, DpsCertificate);
+        Message = $"{result.Name}";
 
         await GetSelectItems();
         return await OnGetAsync();

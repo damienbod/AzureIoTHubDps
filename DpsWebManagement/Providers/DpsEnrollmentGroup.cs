@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Devices.Provisioning.Service;
+﻿using CertificateManager;
+using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -11,24 +12,36 @@ public class DpsEnrollmentGroup
     private IConfiguration Configuration { get;set;}
 
     private readonly ILogger<DpsEnrollmentGroup> _logger;
+    private readonly DpsDbContext _dpsDbContext;
+    private readonly ImportExportCertificate _importExportCertificate;
     ProvisioningServiceClient _provisioningServiceClient;
-    public DpsEnrollmentGroup(IConfiguration config, ILoggerFactory loggerFactory)
+
+    public DpsEnrollmentGroup(IConfiguration config, ILoggerFactory loggerFactory,
+        ImportExportCertificate importExportCertificate,
+        DpsDbContext dpsDbContext)
     {
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsEnrollmentGroup>();
+        _dpsDbContext = dpsDbContext;
+        _importExportCertificate = importExportCertificate;
 
         _provisioningServiceClient = ProvisioningServiceClient.CreateFromConnectionString(
                   Configuration.GetConnectionString("DpsConnection"));
     }
 
-    public async Task CreateDpsEnrollmentGroupAsync(
+    public async Task<(string Name, int Id)> CreateDpsEnrollmentGroupAsync(
         string enrollmentGroupId,
-        X509Certificate2 pemCertificate)
+        string certificatePublicPemId)
     {
         _logger.LogInformation("Starting CreateDpsEnrollmentGroupAsync...");
         _logger.LogInformation("Creating a new enrollmentGroup...");
-       
-        Attestation attestation = X509Attestation.CreateFromRootCertificates(pemCertificate);
+
+        var dpsCert = _dpsDbContext.DpsCertificates
+            .FirstOrDefault(t => t.Id == int.Parse(certificatePublicPemId));
+
+        var cert = _importExportCertificate.PemImportCertificate(dpsCert!.PemPublicKey);
+
+        Attestation attestation = X509Attestation.CreateFromRootCertificates(cert);
         EnrollmentGroup enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
         {
             ProvisioningStatus = ProvisioningStatus.Enabled,
@@ -54,6 +67,17 @@ public class DpsEnrollmentGroup
 
         _logger.LogInformation("EnrollmentGroup created with success.");
         _logger.LogInformation("{enrollmentGroupResult}", enrollmentGroupResult);
+
+        var newItem = new Model.DpsEnrollmentGroup
+        {
+            DpsCertificateId = dpsCert.Id,
+            Name = enrollmentGroupId
+        };
+        _dpsDbContext.DpsEnrollmentGroups.Add(newItem);
+
+        await _dpsDbContext.SaveChangesAsync();
+
+        return (newItem.Name, newItem.Id);
     }
 
     public async Task EnumerateRegistrationsInGroup(QuerySpecification querySpecification, EnrollmentGroup group)
