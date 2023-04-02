@@ -24,7 +24,6 @@ public class DpsCertificatesModel : PageModel
         {
             Id = item.Id,
             Name = item.Name,
-            DownloadLink = $"/DownloadFile/{item.Id}"
         }).ToList();
     }
 }
@@ -34,6 +33,4 @@ public class CertificatesModel
     public int Id { get; set; }
 
     public string? Name { get; set; }
-
-    public string? DownloadLink { get; set; }
 }
