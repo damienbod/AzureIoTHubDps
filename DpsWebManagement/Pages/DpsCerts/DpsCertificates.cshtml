@@ -2,3 +2,44 @@
 @model DpsWebManagement.Pages.DpsCerts.DpsCertificatesModel
 @{
 }
+
+<p>
+    <a asp-page="CreateDpsCertificate"><i class="far fa-plus-square"></i> Create new DPS certificate</a>
+</p>
+<table class="table">
+    <thead class="thead-light">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Certificates[0].Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Certificates[0].Name)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Certificates)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <div class="form-group" style="width:140px">
+                        <a asp-page="./DpsCerts/DownloadDpsCertificate" asp-route-id="@item.Id">download</a>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" style="width:140px">
+                        <a asp-page="../Groups/DpsEnrollmentGroups" asp-route-id="@item.Id"><i class="far fa-folder-open fa-2x"></i></a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

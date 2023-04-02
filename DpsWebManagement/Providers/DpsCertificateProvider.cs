@@ -59,7 +59,7 @@ public class DpsCertificateProvider
         return await _dpsDbContext.DpsCertificates.ToListAsync();
     }
 
-    public async Task<DpsCertificate?> GetDpsCertificatesAsync(int id)
+    public async Task<DpsCertificate?> GetDpsCertificateAsync(int id)
     {
         return await _dpsDbContext.DpsCertificates.FirstOrDefaultAsync(item => item.Id == id);
     }
