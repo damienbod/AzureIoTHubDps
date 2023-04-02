@@ -29,6 +29,17 @@
                                 <li><a class="dropdown-item" asp-area="" asp-page="/DpsCerts/CreateDpsCertificate">Create DPS certificate</a></li>
                             </ul>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            DPS Enrollment Groups
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="" asp-page="/Groups/DpsEnrollmentGroups">DPS Groups</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-page="/Groups/CreateDpsEnrollmentGroup">Create DPS Group</a></li>
+                            </ul>
+                        </li>
+                        
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
