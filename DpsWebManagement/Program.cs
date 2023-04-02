@@ -22,7 +22,7 @@ public class Program
 
         builder.Services.AddCertificateManager();
         builder.Services.AddTransient<DpsRegisterDevice>();
-        builder.Services.AddTransient<DpsEnrollmentGroup>();
+        builder.Services.AddTransient<DpsEnrollmentGroupProvider>();
         builder.Services.AddTransient<DpsUpdateDevice>();
 
         builder.Services.AddScoped<DpsCertificateProvider>();

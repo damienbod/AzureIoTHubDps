@@ -9,7 +9,7 @@ namespace DpsWebManagement.Pages.Groups;
 public class CreateDpsEnrollmentGroupModel : PageModel
 {
     private readonly DpsCertificateProvider _dpsCertificateProvider;
-    private readonly DpsEnrollmentGroup _dpsEnrollmentGroup;
+    private readonly DpsEnrollmentGroupProvider _dpsEnrollmentGroup;
 
     [BindProperty]
     public string? Message { get; set; }
@@ -25,7 +25,7 @@ public class CreateDpsEnrollmentGroupModel : PageModel
     public List<SelectListItem> DpsCertificates { get; set; } = new List<SelectListItem>();
 
     public CreateDpsEnrollmentGroupModel(DpsCertificateProvider dpsCertificateProvider,
-        DpsEnrollmentGroup dpsEnrollmentGroup)
+        DpsEnrollmentGroupProvider dpsEnrollmentGroup)
     {
         _dpsCertificateProvider = dpsCertificateProvider;
         _dpsEnrollmentGroup = dpsEnrollmentGroup;

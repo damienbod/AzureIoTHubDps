@@ -1,27 +1,25 @@
 ﻿using CertificateManager;
 using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Security.Cryptography.X509Certificates;
+using Microsoft.EntityFrameworkCore;
 
 namespace DpsWebManagement.Providers;
 
-public class DpsEnrollmentGroup
+public class DpsEnrollmentGroupProvider
 {
     private IConfiguration Configuration { get;set;}
 
-    private readonly ILogger<DpsEnrollmentGroup> _logger;
+    private readonly ILogger<DpsEnrollmentGroupProvider> _logger;
     private readonly DpsDbContext _dpsDbContext;
     private readonly ImportExportCertificate _importExportCertificate;
     ProvisioningServiceClient _provisioningServiceClient;
 
-    public DpsEnrollmentGroup(IConfiguration config, ILoggerFactory loggerFactory,
+    public DpsEnrollmentGroupProvider(IConfiguration config, ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
         DpsDbContext dpsDbContext)
     {
         Configuration = config;
-        _logger = loggerFactory.CreateLogger<DpsEnrollmentGroup>();
+        _logger = loggerFactory.CreateLogger<DpsEnrollmentGroupProvider>();
         _dpsDbContext = dpsDbContext;
         _importExportCertificate = importExportCertificate;
 
@@ -109,5 +107,10 @@ public class DpsEnrollmentGroup
                 }
             }
         }
+    }
+
+    public List<Model.DpsEnrollmentGroup> GetDpsGroups()
+    {
+        return _dpsDbContext.DpsEnrollmentGroups.ToList();
     }
 }
