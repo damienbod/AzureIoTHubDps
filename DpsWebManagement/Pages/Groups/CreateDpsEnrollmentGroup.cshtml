@@ -10,10 +10,9 @@
         <span asp-validation-for="Name" style="color:red"></span>
     </div>
 
-    <div class="form-group">
+    <div class="mb-3">
         <label for="DpsCertificates">DPS Certificate</label>
-        @Html.DropDownList("DpsCertificate", Model.DpsCertificates,
-        new { @class = "form-control" })
+        @Html.DropDownList("DpsCertificate", Model.DpsCertificates, new { @class = "form-control" })
     </div>
 
     <button type="submit" class="btn btn-primary">Create DPS certificate</button>
