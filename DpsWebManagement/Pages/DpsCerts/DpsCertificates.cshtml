@@ -30,9 +30,9 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    <form asp-page="DownloadDpsCertificate" asp-page-handler="DownloadFile" method="post">
+                    <form action="/FileDownload" method="post">
                         <input type="hidden" value="@item.Id" id="Id" name="Id" />
-                        <button type="submit" class="btn btn-primary">download</button>
+                        <button type="submit" class="btn btn-link">download</button>
                     </form>   
                 </td>
                 <td>

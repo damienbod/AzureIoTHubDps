@@ -12,9 +12,6 @@ public class DpsCertificatesModel : PageModel
 
     public List<CertificatesModel> Certificates { get; set; } = new();
 
-    [BindProperty]
-    public int? Id { get; set; }
-
     public DpsCertificatesModel(DpsCertificateProvider dpsCertificateProvider)
     {
         _dpsCertificateProvider = dpsCertificateProvider;
@@ -29,17 +26,6 @@ public class DpsCertificatesModel : PageModel
             Name = item.Name,
             DownloadLink = $"/DownloadFile/{item.Id}"
         }).ToList();
-    }
-
-    public async Task<ActionResult> OnPostDownloadFile(int id)
-    {
-        var cert = await _dpsCertificateProvider.GetDpsCertificateAsync(id);
-        if(cert == null) throw new ArgumentNullException(nameof(cert));
-        if (cert.PemPublicKey == null) throw new ArgumentNullException(nameof(cert.PemPublicKey));
-
-        return File(Encoding.UTF8.GetBytes(cert.PemPublicKey), 
-            "application/octet-stream",
-            $"{cert.Name}.pem");
     }
 }
 
