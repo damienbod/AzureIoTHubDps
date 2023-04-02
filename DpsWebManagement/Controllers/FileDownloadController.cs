@@ -6,6 +6,8 @@ using System.Text;
 namespace DpsWebManagement.Controllers;
 
 [Authorize]
+[ApiController]
+[Route("api/[controller]")]
 public class FileDownloadController : Controller
 {
     private readonly DpsCertificateProvider _dpsCertificateProvider;

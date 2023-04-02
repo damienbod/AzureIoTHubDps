@@ -47,6 +47,14 @@ namespace DpsWebManagement
                 options.Filters.Add(new AuthorizeFilter(policy));
             }).AddMicrosoftIdentityUI();
 
+            builder.Services.AddControllers(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
