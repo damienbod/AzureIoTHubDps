@@ -25,6 +25,7 @@ You can find the DPS/IoT Hub Connection Strings in the portal:
 Add-Migration "init"
 
 Update-Database
+```
 
 ## History
 
