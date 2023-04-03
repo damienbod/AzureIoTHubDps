@@ -1,9 +1,7 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
-using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
-using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -54,10 +52,14 @@ public class DpsRegisterDeviceProvider
           $"{commonNameDeviceId}", dpsEnrollmentGroupCertificate);
         deviceCertificate.FriendlyName = $"IoT device {commonNameDeviceId}";
 
-        var deviceInPfxBytes = _importExportCertificate
-            .ExportChainedCertificatePfx(password, deviceCertificate, dpsEnrollmentGroupCertificate);
+        // get the public key certificate for the enrollment
+        var deviceCertPublicPem = _importExportCertificate
+            .PemExportPublicKeyCertificate(deviceCertificate);
+        var deviceCertPrivatePem = _importExportCertificate
+            .PemExportPfxFullCertificate(deviceCertificate, password);
 
-        var deviceCert = new X509Certificate2(deviceInPfxBytes, password);
+        var deviceCert = _importExportCertificate
+            .PemImportCertificate(deviceCertPrivatePem, password);
 
         using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(dpsEnrollmentGroupCertificate)))
 
@@ -74,12 +76,6 @@ public class DpsRegisterDeviceProvider
             _logger.LogInformation("DPS client created: {result}", result);
             //return result;
         }
-
-        // get the public key certificate for the enrollment
-        var deviceCertPublicPem = _importExportCertificate
-            .PemExportPublicKeyCertificate(deviceCert);
-        var deviceCertPrivatePem = _importExportCertificate
-            .PemExportPfxFullCertificate(deviceCert, password);
 
         var newItem = new Model.DpsEnrollmentDevice
         {
