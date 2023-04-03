@@ -1,7 +1,10 @@
 ﻿using CertificateManager;
+using CertificateManager.Models;
+using DpsWebManagement.Providers.Model;
 using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace DpsWebManagement.Providers;
 
@@ -12,16 +15,19 @@ public class DpsEnrollmentGroupProvider
     private readonly ILogger<DpsEnrollmentGroupProvider> _logger;
     private readonly DpsDbContext _dpsDbContext;
     private readonly ImportExportCertificate _importExportCertificate;
+    private readonly CreateCertificatesClientServerAuth _createCertsService;
     ProvisioningServiceClient _provisioningServiceClient;
 
     public DpsEnrollmentGroupProvider(IConfiguration config, ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
+        CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
         DpsDbContext dpsDbContext)
     {
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsEnrollmentGroupProvider>();
         _dpsDbContext = dpsDbContext;
         _importExportCertificate = importExportCertificate;
+        _createCertsService = createCertificatesClientServerAuth;
 
         _provisioningServiceClient = ProvisioningServiceClient.CreateFromConnectionString(
                   Configuration.GetConnectionString("DpsConnection"));
@@ -37,9 +43,28 @@ public class DpsEnrollmentGroupProvider
         var dpsCert = _dpsDbContext.DpsCertificates
             .FirstOrDefault(t => t.Id == int.Parse(certificatePublicPemId));
 
-        var cert = _importExportCertificate.PemImportCertificate(dpsCert!.PemPublicKey);
+        var rootCertificate = _importExportCertificate
+            .PemImportCertificate(dpsCert!.PemPrivateKey, dpsCert.Password);
 
-        Attestation attestation = X509Attestation.CreateFromRootCertificates(cert);
+        // create an intermediate for each group
+        var certName = $"{enrollmentGroupId}";
+        var dpsIntermediateGroup = _createCertsService.NewIntermediateChainedCertificate(
+            new DistinguishedName { CommonName = certName, Country = "CH" },
+            new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
+            2, certName, rootCertificate);
+        dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
+
+        var password = GetEncodedRandomString(30);
+        // get the public key certificate for the enrollment
+        var dpsIntermediateGroupPublicPem = _importExportCertificate
+            .PemExportPublicKeyCertificate(dpsIntermediateGroup);
+        var dpsIntermediateGroupPrivatePem = _importExportCertificate
+            .PemExportPfxFullCertificate(dpsIntermediateGroup, password);
+
+        var dpsIntermediateGroupPublic = _importExportCertificate
+            .PemImportCertificate(dpsIntermediateGroupPublicPem);
+
+        Attestation attestation = X509Attestation.CreateFromRootCertificates(dpsIntermediateGroupPublicPem);
         EnrollmentGroup enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
         {
             ProvisioningStatus = ProvisioningStatus.Enabled,
@@ -70,7 +95,10 @@ public class DpsEnrollmentGroupProvider
         {
             DpsCertificateId = dpsCert.Id,
             Name = enrollmentGroupId, 
-            DpsCertificate = dpsCert
+            DpsCertificate = dpsCert,
+            Password = password,
+            PemPublicKey = dpsIntermediateGroupPublicPem,
+            PemPrivateKey = dpsIntermediateGroupPrivatePem
         };
         _dpsDbContext.DpsEnrollmentGroups.Add(newItem);
 
@@ -115,5 +143,18 @@ public class DpsEnrollmentGroupProvider
     public List<Model.DpsEnrollmentGroup> GetDpsGroups()
     {
         return _dpsDbContext.DpsEnrollmentGroups.ToList();
+    }
+
+    private string GetEncodedRandomString(int length)
+    {
+        var base64 = Convert.ToBase64String(GenerateRandomBytes(length));
+        return base64;
+    }
+
+    private byte[] GenerateRandomBytes(int length)
+    {
+        var byteArray = new byte[length];
+        RandomNumberGenerator.Fill(byteArray);
+        return byteArray;
     }
 }

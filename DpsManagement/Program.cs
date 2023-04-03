@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 namespace DpsManagement;
@@ -113,7 +112,6 @@ class Program
         // get the public key certificate for the enrollment
         var dpsIntermediateGroupPem = iec.PemExportPublicKeyCertificate(dpsIntermediateGroup);
         var dpsIntermediateGroupPublic = iec.PemImportCertificate(dpsIntermediateGroupPem);
-        //var dpsIntermediateGroupPem = iec.PemExportPublicKeyCertificate(dpsIntermediateGroup);
 
         // use public key only certificate
         await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(
