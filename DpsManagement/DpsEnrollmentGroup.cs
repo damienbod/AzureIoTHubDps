@@ -21,9 +21,7 @@ public class DpsEnrollmentGroup
                   Configuration.GetConnectionString("DpsConnection"));
     }
 
-    public async Task CreateDpsEnrollmentGroupAsync(
-        string enrollmentGroupId,
-        X509Certificate2 pemCertificate)
+    public async Task CreateDpsEnrollmentGroupAsync(string enrollmentGroupId, X509Certificate2 pemCertificate)
     {
         _logger.LogInformation("Starting CreateDpsEnrollmentGroupAsync...");
         _logger.LogInformation("Creating a new enrollmentGroup...");
