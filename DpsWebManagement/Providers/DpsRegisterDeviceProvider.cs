@@ -1,8 +1,10 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
+using DpsWebManagement.Providers.Model;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -104,5 +106,10 @@ public class DpsRegisterDeviceProvider
         var byteArray = new byte[length];
         RandomNumberGenerator.Fill(byteArray);
         return byteArray;
+    }
+
+    public async Task<List<DpsEnrollmentDevice>> GetDpsDevicesAsync()
+    {
+        return await _dpsDbContext.DpsEnrollmentDevices.ToListAsync();
     }
 }

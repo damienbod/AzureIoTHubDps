@@ -2,3 +2,47 @@
 @model DpsWebManagement.Pages.Devices.DpsEnrollmentGroupDevicesModel
 @{
 }
+
+
+
+<p>
+    <a asp-page="CreateDpsEnrollmentGroup">Create new Device</a>
+</p>
+<table class="table">
+    <thead class="thead-light">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DpsDevices[0].Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DpsDevices[0].Name)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.DpsDevices)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <form action="/api/FileDownload/DpsCertificatePem" method="post">
+                        <input type="hidden" value="@item.Id" id="Id" name="Id" />
+                        <button type="submit" class="btn btn-link">download</button>
+                    </form>
+                </td>
+                <td>
+                    <div class="form-group" style="width:140px">
+                        <a asp-page="../Devices/DpsEnrollmentGroupDevices" asp-route-id="@item.Id">delete</a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
