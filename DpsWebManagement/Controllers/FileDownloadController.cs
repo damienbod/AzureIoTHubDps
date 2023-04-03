@@ -63,29 +63,4 @@ public class FileDownloadController : Controller
             "application/octet-stream",
             $"{cert.Name}-private.pem");
     }
-
-    [HttpPost("DpsDevicePrivateKeyPfx")]
-    public async Task<IActionResult> DpsDevicePrivateKeyPfxAsync([FromForm] int id)
-    {
-        var cert = await _dpsRegisterDeviceProvider.GetDpsDeviceAsync(id);
-        var groupCert = await _dpsEnrollmentGroupProvider.GetDpsGroupAsync(cert.DpsEnrollmentGroupId);
-        var rootCert = await _dpsCertificateProvider.GetDpsCertificateAsync(groupCert.DpsCertificateId);
-
-        if (cert == null) throw new ArgumentNullException(nameof(cert));
-        if (cert.PemPrivateKey == null) throw new ArgumentNullException(nameof(cert.PemPrivateKey));
-
-        var xcert = _importExportCertificate.PemImportCertificate(cert.PemPrivateKey, cert.Password);
-        var xgroupCert = _importExportCertificate.PemImportCertificate(groupCert.PemPrivateKey, groupCert.Password);
-        var xrootCert = _importExportCertificate.PemImportCertificate(rootCert.PemPrivateKey, rootCert.Password);
-
-        var rootInPfxBytes = _importExportCertificate.ExportRootPfx(rootCert.Password, xrootCert);
-           
-        var groupInPfxBytes = _importExportCertificate
-            .ExportChainedCertificatePfx(groupCert.Password, xgroupCert, xrootCert);
-
-        var deviceInPfxBytes = _importExportCertificate
-            .ExportChainedCertificatePfx(groupCert.Password, xcert, xgroupCert);
-
-        return File(deviceInPfxBytes, "application/octet-stream", $"{cert.Name}.pfx");
-    }
 }

@@ -31,8 +31,8 @@ class Program
                 .BuildServiceProvider();
             var iec = serviceProvider.GetService<ImportExportCertificate>();
             
-            var secret = "5RUWLhz1HSrgunftbqRQBplG5dOPHARz2CpdEOAW";
-            var key = "r1-g1-d4-private.pem";
+            var secret = "mFziI4KAd/dHhHwItSZr5RDVedsxIjHgf7SN38uy";
+            var key = "r1-g1-d6-private.pem";
 
             // PEM
             string pem = File.ReadAllText($"{_pathToCerts}{key}");
