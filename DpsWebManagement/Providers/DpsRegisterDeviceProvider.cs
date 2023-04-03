@@ -63,7 +63,8 @@ public class DpsRegisterDeviceProvider
         var deviceInPfxBytes = _importExportCertificate
             .ExportChainedCertificatePfx("1234", deviceCertificate, dpsEnrollmentGroupCertificate);
      
-        File.WriteAllBytes($"{commonNameDeviceId}.pfx", deviceInPfxBytes);
+        // Add this for manual testing
+        // File.WriteAllBytes($"{commonNameDeviceId}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the enrollment
         var deviceCertPublicPem = _importExportCertificate
