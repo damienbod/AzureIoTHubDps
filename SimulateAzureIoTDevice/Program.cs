@@ -27,18 +27,17 @@ class Program
         try
         {
             var serviceProvider = new ServiceCollection()
-                .AddCertificateManager()
-                .BuildServiceProvider();
+                .AddCertificateManager().BuildServiceProvider();
             var iec = serviceProvider.GetService<ImportExportCertificate>();
-            
             var secret = "mFziI4KAd/dHhHwItSZr5RDVedsxIjHgf7SN38uy";
             var key = "r1-g1-d6-private.pem";
 
             // PEM
             string pem = File.ReadAllText($"{_pathToCerts}{key}");
-            var certTestdevice01 = iec.PemImportCertificate(pem, secret);
- 
+            var certTestdevice01 = iec!.PemImportCertificate(pem, secret);
+
             // PFX
+            //var deviceId = "testdevice01";
             //var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
 
             var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
