@@ -69,9 +69,12 @@ public class DpsEnrollmentGroupProvider
         var newItem = new Model.DpsEnrollmentGroup
         {
             DpsCertificateId = dpsCert.Id,
-            Name = enrollmentGroupId
+            Name = enrollmentGroupId, 
+            DpsCertificate = dpsCert
         };
         _dpsDbContext.DpsEnrollmentGroups.Add(newItem);
+
+        dpsCert.DpsEnrollmentGroups.Add(newItem);
 
         await _dpsDbContext.SaveChangesAsync();
 
