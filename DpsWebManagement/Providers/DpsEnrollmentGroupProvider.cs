@@ -157,4 +157,10 @@ public class DpsEnrollmentGroupProvider
         RandomNumberGenerator.Fill(byteArray);
         return byteArray;
     }
+
+    public async Task<DpsEnrollmentGroup?> GetDpsGroupAsync(int id)
+    {
+        return await _dpsDbContext.DpsEnrollmentGroups
+            .FirstOrDefaultAsync(d => d.Id == id);
+    }
 }

@@ -15,14 +15,17 @@ public class FileDownloadController : Controller
     private readonly DpsCertificateProvider _dpsCertificateProvider;
     private readonly DpsRegisterDeviceProvider _dpsRegisterDeviceProvider;
     private readonly ImportExportCertificate _importExportCertificate;
+    private readonly DpsEnrollmentGroupProvider _dpsEnrollmentGroupProvider;
 
     public FileDownloadController(DpsCertificateProvider dpsCertificateProvider,
         DpsRegisterDeviceProvider dpsRegisterDeviceProvider,
-        ImportExportCertificate importExportCertificate)
+        ImportExportCertificate importExportCertificate,
+        DpsEnrollmentGroupProvider dpsEnrollmentGroupProvider)
     {
         _dpsCertificateProvider = dpsCertificateProvider;
         _dpsRegisterDeviceProvider = dpsRegisterDeviceProvider;
         _importExportCertificate = importExportCertificate;
+        _dpsEnrollmentGroupProvider = dpsEnrollmentGroupProvider;
     }
 
     [HttpPost("DpsCertificatePem")]
@@ -65,13 +68,23 @@ public class FileDownloadController : Controller
     public async Task<IActionResult> DpsDevicePrivateKeyPfxAsync([FromForm] int id)
     {
         var cert = await _dpsRegisterDeviceProvider.GetDpsDeviceAsync(id);
+        var groupCert = await _dpsEnrollmentGroupProvider.GetDpsGroupAsync(cert.DpsEnrollmentGroupId);
+        var rootCert = await _dpsCertificateProvider.GetDpsCertificateAsync(groupCert.DpsCertificateId);
+
         if (cert == null) throw new ArgumentNullException(nameof(cert));
         if (cert.PemPrivateKey == null) throw new ArgumentNullException(nameof(cert.PemPrivateKey));
 
-        var xcert = _importExportCertificate
-            .PemImportCertificate(cert.PemPrivateKey, cert.Password);
+        var xcert = _importExportCertificate.PemImportCertificate(cert.PemPrivateKey, cert.Password);
+        var xgroupCert = _importExportCertificate.PemImportCertificate(groupCert.PemPrivateKey, groupCert.Password);
+        var xrootCert = _importExportCertificate.PemImportCertificate(rootCert.PemPrivateKey, rootCert.Password);
 
-        var deviceInPfxBytes = _importExportCertificate.ExportRootPfx(cert.Password, xcert);
+        var rootInPfxBytes = _importExportCertificate.ExportRootPfx(rootCert.Password, xrootCert);
+           
+        var groupInPfxBytes = _importExportCertificate
+            .ExportChainedCertificatePfx(groupCert.Password, xgroupCert, xrootCert);
+
+        var deviceInPfxBytes = _importExportCertificate
+            .ExportChainedCertificatePfx(groupCert.Password, xcert, xgroupCert);
 
         return File(deviceInPfxBytes, "application/octet-stream", $"{cert.Name}.pfx");
     }

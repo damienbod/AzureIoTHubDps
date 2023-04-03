@@ -1,17 +1,15 @@
-﻿using System;
-using Microsoft.Azure.Devices.Client;
-using System.Security.Cryptography.X509Certificates;
+﻿using Microsoft.Azure.Devices.Client;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using CertificateManager;
 
 namespace SimulateAzureIoTDevice;
 
 class Program
 {
     static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
-    static readonly string _pathToCerts = $"{_directory}/../../../../Certs/";
+    static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
 
     // Define the device
     private static readonly string deviceId = "testdevice01";
@@ -28,7 +26,21 @@ class Program
     {
         try
         {
-            var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
+            var serviceProvider = new ServiceCollection()
+                .AddCertificateManager()
+                .BuildServiceProvider();
+            var iec = serviceProvider.GetService<ImportExportCertificate>();
+            
+            var secret = "5RUWLhz1HSrgunftbqRQBplG5dOPHARz2CpdEOAW";
+            var key = "r1-g1-d4-private.pem";
+
+            // PEM
+            string pem = File.ReadAllText($"{_pathToCerts}{key}");
+            var certTestdevice01 = iec.PemImportCertificate(pem, secret);
+ 
+            // PFX
+            //var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
+
             var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
 
