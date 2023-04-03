@@ -39,12 +39,17 @@
 
         <form action="/api/FileDownload/DpsDevicePublicPem" method="post">
             <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-            <button type="submit" class="btn btn-link">download Public PEM</button>
+            <button type="submit" class="btn btn-link">Download Public PEM</button>
         </form>
 
         <form action="/api/FileDownload/DpsDevicePrivateKeyPem" method="post">
             <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-            <button type="submit" class="btn btn-link">download Private Key PEM</button>
+            <button type="submit" class="btn btn-link">Download Private Key PEM</button>
+        </form>
+
+        <form action="/api/FileDownload/DpsDevicePrivateKeyPfx" method="post">
+            <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+            <button type="submit" class="btn btn-link">Download Private Key PFX</button>
         </form>
     </div>
 </div>
