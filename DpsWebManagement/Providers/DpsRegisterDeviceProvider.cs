@@ -112,4 +112,10 @@ public class DpsRegisterDeviceProvider
     {
         return await _dpsDbContext.DpsEnrollmentDevices.ToListAsync();
     }
+
+    public async Task<DpsEnrollmentDevice?> GetDpsDeviceAsync(int id)
+    {
+        return await _dpsDbContext.DpsEnrollmentDevices
+            .FirstOrDefaultAsync(d => d.Id == id);
+    }
 }

@@ -1,0 +1,50 @@
+﻿@page
+@model DpsWebManagement.Pages.Devices.DeviceModel
+@{
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm-4">
+                DPS Device ID
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.Id)
+            </div>
+        </div>
+
+        <hr />
+        <div class="row">
+            <div class="col-sm-4">
+                Device Name
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.Name)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                Password
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.Password)
+            </div>
+        </div>
+
+        <hr />
+
+        <form action="/api/FileDownload/DpsDevicePublicPem" method="post">
+            <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+            <button type="submit" class="btn btn-link">download Public PEM</button>
+        </form>
+
+        <form action="/api/FileDownload/DpsDevicePrivateKeyPem" method="post">
+            <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+            <button type="submit" class="btn btn-link">download Private Key PEM</button>
+        </form>
+    </div>
+</div>
