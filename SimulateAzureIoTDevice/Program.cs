@@ -3,6 +3,7 @@ using System.Text;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using CertificateManager;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SimulateAzureIoTDevice;
 
@@ -34,11 +35,11 @@ class Program
 
             // PEM
             string pem = File.ReadAllText($"{_pathToCerts}{key}");
-            var certTestdevice01 = iec!.PemImportCertificate(pem, secret);
+            //var certTestdevice01 = iec!.PemImportCertificate(pem, secret);
 
             // PFX
-            //var deviceId = "testdevice01";
-            //var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
+            var deviceId = "enrollment-group3-device-01"; // "testdevice01";
+            var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
 
             var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
