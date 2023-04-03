@@ -16,8 +16,8 @@ public class DpsEnrollmentGroupsModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var data = _dpsEnrollmentGroup.GetDpsGroups();
-        DpsEnrollmentGroups = data.Select(item => new DpsEnrollmentGroupModel
+        var data = await _dpsEnrollmentGroup.GetDpsGroupsAsync();
+        DpsEnrollmentGroups =  data.Select(item => new DpsEnrollmentGroupModel
         {
             Id = item.Id,
             Name = item.Name

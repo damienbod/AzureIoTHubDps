@@ -50,7 +50,7 @@ public class DpsEnrollmentGroupProvider
         var certName = $"{enrollmentGroupId}";
         var dpsIntermediateGroup = _createCertsService.NewIntermediateChainedCertificate(
             new DistinguishedName { CommonName = certName, Country = "CH" },
-            new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
+            new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
             2, certName, rootCertificate);
         dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
 
@@ -140,9 +140,9 @@ public class DpsEnrollmentGroupProvider
         }
     }
 
-    public List<Model.DpsEnrollmentGroup> GetDpsGroups()
+    public async Task<List<DpsEnrollmentGroup>> GetDpsGroupsAsync()
     {
-        return _dpsDbContext.DpsEnrollmentGroups.ToList();
+        return await _dpsDbContext.DpsEnrollmentGroups.ToListAsync();
     }
 
     private string GetEncodedRandomString(int length)

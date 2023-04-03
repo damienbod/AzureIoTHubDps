@@ -1,6 +1,4 @@
 ﻿using Microsoft.Azure.Devices.Provisioning.Service;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace DpsWebManagement.Providers;
 
