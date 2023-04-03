@@ -1,6 +1,7 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
 using DpsWebManagement.Providers.Model;
+using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
@@ -53,6 +54,11 @@ public class DpsRegisterDeviceProvider
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
           $"{commonNameDeviceId}", dpsEnrollmentGroupCertificate);
         deviceCertificate.FriendlyName = $"IoT device {commonNameDeviceId}";
+
+        var deviceInPfxBytes = _importExportCertificate
+            .ExportChainedCertificatePfx("1234", deviceCertificate, dpsEnrollmentGroupCertificate);
+     
+        File.WriteAllBytes($"{commonNameDeviceId}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the enrollment
         var deviceCertPublicPem = _importExportCertificate

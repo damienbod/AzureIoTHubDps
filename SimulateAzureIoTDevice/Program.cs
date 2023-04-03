@@ -30,16 +30,16 @@ class Program
             var serviceProvider = new ServiceCollection()
                 .AddCertificateManager().BuildServiceProvider();
             var iec = serviceProvider.GetService<ImportExportCertificate>();
-            var secret = "mFziI4KAd/dHhHwItSZr5RDVedsxIjHgf7SN38uy";
-            var key = "r1-g1-d6-private.pem";
+            var secret = "DeZioxyBN/CQfMybR33NmkdyiHJCv9nULbeQ4Zef";
+            var key = "root-one-group1-d1-private.pem";
 
             // PEM
             string pem = File.ReadAllText($"{_pathToCerts}{key}");
-            //var certTestdevice01 = iec!.PemImportCertificate(pem, secret);
+            var certTestdevice01 = iec!.PemImportCertificate(pem, secret);
 
             // PFX
-            var deviceId = "enrollment-group3-device-01"; // "testdevice01";
-            var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
+            var deviceId = "root-one-group1-d1"; // "testdevice01";
+            //var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", "1234");
 
             var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
