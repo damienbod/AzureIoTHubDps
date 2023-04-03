@@ -45,6 +45,8 @@ public class CreateDpsEnrollmentGroupDeviceModel : PageModel
             return await OnGetAsync();
         }
 
+        // TODO Validate Name and DpsEnrollmentGroup
+
         await _dpsRegisterDeviceProvider.RegisterDeviceAsync(Name, DpsEnrollmentGroup);
         Message = $"{Name}";
 

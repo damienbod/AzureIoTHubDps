@@ -46,6 +46,11 @@ public class DpsRegisterDeviceProvider
         var dpsEnrollmentGroup = _dpsDbContext.DpsEnrollmentGroups
            .FirstOrDefault(t => t.Id == int.Parse(dpsEnrollmentGroupId));
 
+        if(!commonNameDeviceId.ToLower().Contains(dpsEnrollmentGroupId.ToLower()))
+        {
+            throw new ArgumentException("commonNameDeviceId must start with the dpsEnrollmentGroupId");
+        }
+
         var dpsEnrollmentGroupCertificate = _importExportCertificate
             .PemImportCertificate(dpsEnrollmentGroup!.PemPrivateKey, dpsEnrollmentGroup.Password);
 
