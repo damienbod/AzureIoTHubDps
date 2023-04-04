@@ -134,6 +134,7 @@ public class DpsRegisterDeviceProvider
     public async Task<DpsEnrollmentDevice?> GetDpsDeviceAsync(int id)
     {
         return await _dpsDbContext.DpsEnrollmentDevices
+            .Include(device => device.DpsEnrollmentGroup)
             .FirstOrDefaultAsync(d => d.Id == id);
     }
 }
