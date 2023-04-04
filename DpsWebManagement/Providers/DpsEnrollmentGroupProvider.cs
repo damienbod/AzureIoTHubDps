@@ -52,7 +52,7 @@ public class DpsEnrollmentGroupProvider
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
             2, certName, rootCertificate);
-        dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
+        //dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
 
         var password = GetEncodedRandomString(30);
         // get the public key certificate for the enrollment

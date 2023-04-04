@@ -28,8 +28,7 @@ public class DpsCertificateProvider
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
             3, certName);
-
-        dpsCertificate.FriendlyName = "DPS group root certificate";
+        //dpsCertificate.FriendlyName = "DPS group root certificate";
 
         var publicKeyPem = _importExportCertificate.PemExportPublicKeyCertificate(dpsCertificate);
         var privateKeyPem = _importExportCertificate.PemExportPfxFullCertificate(dpsCertificate, password);
@@ -71,7 +70,7 @@ public class DpsCertificateProvider
         return base64;
     }
 
-    private byte[] GenerateRandomBytes(int length)
+    private static byte[] GenerateRandomBytes(int length)
     {
         var byteArray = new byte[length];
         RandomNumberGenerator.Fill(byteArray);
