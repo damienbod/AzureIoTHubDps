@@ -1,4 +1,5 @@
 using DpsWebManagement.Providers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace DpsWebManagement.Pages.Devices;
@@ -6,6 +7,9 @@ namespace DpsWebManagement.Pages.Devices;
 public class DpsEnrollmentGroupDevicesModel : PageModel
 {
     private readonly DpsRegisterDeviceProvider _dpsRegisterDeviceProvider;
+
+    [BindProperty(SupportsGet = true)]
+    public int? Id { get; set; }
 
     public List<DpsDeviceModel> DpsDevices { get; set; } = new List<DpsDeviceModel>();
 
@@ -16,7 +20,7 @@ public class DpsEnrollmentGroupDevicesModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var data = await _dpsRegisterDeviceProvider.GetDpsDevicesAsync();
+        var data = await _dpsRegisterDeviceProvider.GetDpsDevicesAsync(Id);
         DpsDevices = data.Select(item => new DpsDeviceModel
         {
             Id = item.Id,

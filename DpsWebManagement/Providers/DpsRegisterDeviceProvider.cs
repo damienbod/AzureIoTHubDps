@@ -126,9 +126,12 @@ public class DpsRegisterDeviceProvider
         return byteArray;
     }
 
-    public async Task<List<DpsEnrollmentDevice>> GetDpsDevicesAsync()
+    public async Task<List<DpsEnrollmentDevice>> GetDpsDevicesAsync(int? id)
     {
-        return await _dpsDbContext.DpsEnrollmentDevices.ToListAsync();
+        if(id == null)
+            return await _dpsDbContext.DpsEnrollmentDevices.ToListAsync();
+
+        return await _dpsDbContext.DpsEnrollmentDevices.Where(s => s.DpsEnrollmentGroupId == id).ToListAsync();
     }
 
     public async Task<DpsEnrollmentDevice?> GetDpsDeviceAsync(int id)
