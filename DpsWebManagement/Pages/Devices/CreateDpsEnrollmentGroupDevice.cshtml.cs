@@ -40,20 +40,17 @@ public class CreateDpsEnrollmentGroupDeviceModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         var group = await _dpsEnrollmentGroup.GetDpsGroupAsync(int.Parse(DpsEnrollmentGroup));
-        var isNameValid = Name != null && Name.ToLower().StartsWith(group!.Name.ToLower());
+        var isNameValid = Name != null && Name.StartsWith(group!.Name);
         if (!isNameValid)
         {
-            ModelState.AddModelError("Name", $"The Device Name should start with the group name: {group.Name}");
+            ModelState.AddModelError("Name", $"The device name should start with the group name: {group!.Name}");
         }
-
 
         if (!ModelState.IsValid)
         {
             await GetSelectItems();
             return await OnGetAsync();
         }
-
-        // TODO Validate Name and DpsEnrollmentGroup
 
         await _dpsRegisterDeviceProvider.RegisterDeviceAsync(Name, DpsEnrollmentGroup);
         Message = $"{Name}";
