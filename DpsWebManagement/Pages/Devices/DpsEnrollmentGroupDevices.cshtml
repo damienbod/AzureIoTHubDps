@@ -20,7 +20,6 @@
                 DPS enrollment group
             </th>
             <th></th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -38,11 +37,6 @@
                 </td>
                 <td>
                     <a asp-page="../Devices/Device" asp-route-id="@item.Id">details</a>
-                </td>
-                <td>
-                    <div class="form-group" style="width:140px">
-                        <a asp-page="../Devices/DeviceDelete" asp-route-id="@item.Id">delete</a>
-                    </div>
                 </td>
             </tr>
         }

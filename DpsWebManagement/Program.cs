@@ -21,10 +21,8 @@ public class Program
         );
 
         builder.Services.AddCertificateManager();
-        builder.Services.AddTransient<DpsRegisterDeviceProvider>();
-        builder.Services.AddTransient<DpsEnrollmentGroupProvider>();
-        builder.Services.AddTransient<DpsUpdateDevice>();
-
+        builder.Services.AddScoped<DpsRegisterDeviceProvider>();
+        builder.Services.AddScoped<DpsEnrollmentGroupProvider>();
         builder.Services.AddScoped<DpsCertificateProvider>();
 
         builder.Services.AddDistributedMemoryCache();
