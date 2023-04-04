@@ -36,20 +36,16 @@ public class DpsRegisterDeviceProvider
     /// transport exception if the Common Name "CN=" value within the device x.509 certificate does not match the Group Enrollment name within DPS.
     /// https://github.com/Azure/azure-iot-sdk-c/blob/main/tools/CACertificates/CACertificateOverview.md
     /// </summary>
-    public async Task RegisterDeviceAsync(
+    public async Task<int?> RegisterDeviceAsync(
         string commonNameDeviceId, string dpsEnrollmentGroupId)
     {
+        int? deviceId = null;
         var scopeId = Configuration["ScopeId"];
         string? password = GetEncodedRandomString(30);
         commonNameDeviceId = commonNameDeviceId.ToLower();
 
         var dpsEnrollmentGroup = _dpsDbContext.DpsEnrollmentGroups
            .FirstOrDefault(t => t.Id == int.Parse(dpsEnrollmentGroupId));
-
-        if(!commonNameDeviceId.ToLower().Contains(dpsEnrollmentGroupId.ToLower()))
-        {
-            throw new ArgumentException("commonNameDeviceId must start with the dpsEnrollmentGroupId");
-        }
 
         var dpsEnrollmentGroupCertificate = _importExportCertificate
             .PemImportCertificate(dpsEnrollmentGroup!.PemPrivateKey, dpsEnrollmentGroup.Password);
@@ -105,6 +101,9 @@ public class DpsRegisterDeviceProvider
         dpsEnrollmentGroup.DpsEnrollmentDevices.Add(newItem);
 
         await _dpsDbContext.SaveChangesAsync();
+
+        deviceId = newItem.Id;
+        return deviceId;
     }
 
     private string GetEncodedRandomString(int length)

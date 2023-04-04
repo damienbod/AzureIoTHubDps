@@ -19,3 +19,8 @@
 </form>
 
 <br />
+
+@if (Model.DeviceId != null)
+{
+    <a asp-page="../Devices/Device" asp-route-id="@Model.DeviceId">Device details and download</a>
+}
