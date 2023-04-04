@@ -48,8 +48,8 @@ public class CreateDpsEnrollmentGroupModel : PageModel
         var result = await _dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(Name, DpsCertificate);
         Message = $"{result.Name}";
 
-        await GetSelectItems();
-        return await OnGetAsync();
+
+        return Redirect("/Groups/DpsEnrollmentGroups");
     }
 
     private async Task GetSelectItems()
