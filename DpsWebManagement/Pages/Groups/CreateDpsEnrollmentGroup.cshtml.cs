@@ -48,7 +48,6 @@ public class CreateDpsEnrollmentGroupModel : PageModel
         var result = await _dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(Name, DpsCertificate);
         Message = $"{result.Name}";
 
-
         return Redirect("/Groups/DpsEnrollmentGroups");
     }
 
