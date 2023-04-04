@@ -1,4 +1,5 @@
 using DpsWebManagement.Providers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace DpsWebManagement.Pages.Groups;
@@ -6,6 +7,9 @@ namespace DpsWebManagement.Pages.Groups;
 public class DpsEnrollmentGroupsModel : PageModel
 {
     private readonly DpsEnrollmentGroupProvider _dpsEnrollmentGroup;
+
+    [BindProperty(SupportsGet = true)]
+    public int? Id { get; set; }
 
     public List<DpsEnrollmentGroupModel> DpsEnrollmentGroups { get; set; } = new List<DpsEnrollmentGroupModel>();
 
@@ -16,7 +20,7 @@ public class DpsEnrollmentGroupsModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var data = await _dpsEnrollmentGroup.GetDpsGroupsAsync();
+        var data = await _dpsEnrollmentGroup.GetDpsGroupsAsync(Id);
         DpsEnrollmentGroups =  data.Select(item => new DpsEnrollmentGroupModel
         {
             Id = item.Id,

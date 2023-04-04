@@ -16,7 +16,7 @@ public class DpsEnrollmentGroupProvider
     private readonly DpsDbContext _dpsDbContext;
     private readonly ImportExportCertificate _importExportCertificate;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
-    ProvisioningServiceClient _provisioningServiceClient;
+    private readonly ProvisioningServiceClient _provisioningServiceClient;
 
     public DpsEnrollmentGroupProvider(IConfiguration config, ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
@@ -65,7 +65,7 @@ public class DpsEnrollmentGroupProvider
             .PemImportCertificate(dpsIntermediateGroupPublicPem);
 
         Attestation attestation = X509Attestation.CreateFromRootCertificates(dpsIntermediateGroupPublicPem);
-        EnrollmentGroup enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
+        var enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
         {
             ProvisioningStatus = ProvisioningStatus.Enabled,
             ReprovisionPolicy = new ReprovisionPolicy
@@ -123,7 +123,7 @@ public class DpsEnrollmentGroupProvider
     public async Task QueryEnrollmentGroupAsync()
     {
         _logger.LogInformation("Creating a query for enrollmentGroups...");
-        QuerySpecification querySpecification = new QuerySpecification("SELECT * FROM enrollmentGroups");
+        var querySpecification = new QuerySpecification("SELECT * FROM enrollmentGroups");
         using (Query query = _provisioningServiceClient.CreateEnrollmentGroupQuery(querySpecification))
         {
             while (query.HasNext())
@@ -140,9 +140,12 @@ public class DpsEnrollmentGroupProvider
         }
     }
 
-    public async Task<List<DpsEnrollmentGroup>> GetDpsGroupsAsync()
+    public async Task<List<DpsEnrollmentGroup>> GetDpsGroupsAsync(int? certificateId = null)
     {
-        return await _dpsDbContext.DpsEnrollmentGroups.ToListAsync();
+        if (certificateId == null)
+            return await _dpsDbContext.DpsEnrollmentGroups.ToListAsync();
+
+        return await _dpsDbContext.DpsEnrollmentGroups.Where(s => s.DpsCertificateId == certificateId).ToListAsync();
     }
 
     private string GetEncodedRandomString(int length)
@@ -151,7 +154,7 @@ public class DpsEnrollmentGroupProvider
         return base64;
     }
 
-    private byte[] GenerateRandomBytes(int length)
+    private static byte[] GenerateRandomBytes(int length)
     {
         var byteArray = new byte[length];
         RandomNumberGenerator.Fill(byteArray);

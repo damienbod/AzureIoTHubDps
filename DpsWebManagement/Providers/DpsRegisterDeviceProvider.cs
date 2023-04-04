@@ -52,9 +52,9 @@ public class DpsRegisterDeviceProvider
 
         var deviceCertificate = _createCertsService.NewDeviceChainedCertificate(
           new DistinguishedName { CommonName = $"{commonNameDeviceId}" },
-          new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
+          new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
           $"{commonNameDeviceId}", dpsEnrollmentGroupCertificate);
-        deviceCertificate.FriendlyName = $"IoT device {commonNameDeviceId}";
+        //deviceCertificate.FriendlyName = $"IoT device {commonNameDeviceId}";
 
         var deviceInPfxBytes = _importExportCertificate
             .ExportChainedCertificatePfx("1234", deviceCertificate, dpsEnrollmentGroupCertificate);
@@ -126,12 +126,12 @@ public class DpsRegisterDeviceProvider
         return byteArray;
     }
 
-    public async Task<List<DpsEnrollmentDevice>> GetDpsDevicesAsync(int? id)
+    public async Task<List<DpsEnrollmentDevice>> GetDpsDevicesAsync(int? dpsEnrollmentGroupId)
     {
-        if(id == null)
+        if(dpsEnrollmentGroupId == null)
             return await _dpsDbContext.DpsEnrollmentDevices.ToListAsync();
 
-        return await _dpsDbContext.DpsEnrollmentDevices.Where(s => s.DpsEnrollmentGroupId == id).ToListAsync();
+        return await _dpsDbContext.DpsEnrollmentDevices.Where(s => s.DpsEnrollmentGroupId == dpsEnrollmentGroupId).ToListAsync();
     }
 
     public async Task<DpsEnrollmentDevice?> GetDpsDeviceAsync(int id)
