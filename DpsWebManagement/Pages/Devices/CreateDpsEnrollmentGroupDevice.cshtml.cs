@@ -55,8 +55,9 @@ public class CreateDpsEnrollmentGroupDeviceModel : PageModel
             return await OnGetAsync();
         }
 
-        DeviceId = await _dpsRegisterDeviceProvider.RegisterDeviceAsync(Name, DpsEnrollmentGroup);
-        Message = $"{Name}";
+        var result = await _dpsRegisterDeviceProvider.RegisterDeviceAsync(Name!, DpsEnrollmentGroup);
+        Message = $"{result.ErrorMessage}";
+        DeviceId  = result.DeviceId;
 
         await GetSelectItems();
         return await OnGetAsync();

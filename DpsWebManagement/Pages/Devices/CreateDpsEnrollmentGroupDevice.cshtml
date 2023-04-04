@@ -24,3 +24,8 @@
 {
     <a asp-page="../Devices/Device" asp-route-id="@Model.DeviceId">Device details and download</a>
 }
+
+@if (Model.Message != null)
+{
+    <textarea class="form-control" rows="5" id="Message" name="Message" readonly>@Model.Message</textarea>
+}

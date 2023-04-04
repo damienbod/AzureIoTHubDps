@@ -36,7 +36,7 @@ public class DpsRegisterDeviceProvider
     /// transport exception if the Common Name "CN=" value within the device x.509 certificate does not match the Group Enrollment name within DPS.
     /// https://github.com/Azure/azure-iot-sdk-c/blob/main/tools/CACertificates/CACertificateOverview.md
     /// </summary>
-    public async Task<int?> RegisterDeviceAsync(
+    public async Task<(int? DeviceId, string? ErrorMessage)> RegisterDeviceAsync(
         string commonNameDeviceId, string dpsEnrollmentGroupId)
     {
         int? deviceId = null;
@@ -82,9 +82,16 @@ public class DpsRegisterDeviceProvider
             var client = ProvisioningDeviceClient
                 .Create("global.azure-devices-provisioning.net", scopeId, security, transport);
 
-            var result = await client.RegisterAsync();
-            _logger.LogInformation("DPS client created: {result}", result);
-            //return result;
+            try
+            {
+                var result = await client.RegisterAsync();
+                _logger.LogInformation("DPS client created: {result}", result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("DPS client created: {result}", ex.Message);
+                return (null, ex.Message);
+            }
         }
 
         var newItem = new Model.DpsEnrollmentDevice
@@ -103,7 +110,7 @@ public class DpsRegisterDeviceProvider
         await _dpsDbContext.SaveChangesAsync();
 
         deviceId = newItem.Id;
-        return deviceId;
+        return (deviceId, null);
     }
 
     private string GetEncodedRandomString(int length)
