@@ -20,7 +20,8 @@ public class DpsEnrollmentGroupsModel : PageModel
         DpsEnrollmentGroups =  data.Select(item => new DpsEnrollmentGroupModel
         {
             Id = item.Id,
-            Name = item.Name
+            Name = item.Name,
+            DpsCertificate = item.DpsCertificateId
         }).ToList();
     }
 }
@@ -30,4 +31,6 @@ public class DpsEnrollmentGroupModel
     public int Id { get; set; }
 
     public string? Name { get; set; }
+
+    public int? DpsCertificate { get; set; }    
 }

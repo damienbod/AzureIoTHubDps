@@ -26,7 +26,8 @@ public class DeviceModel : PageModel
         {
             Id = data.Id,
             Name = data.Name,
-            Password = data.Password
+            Password = data.Password,
+            DpsEnrollmentGroup = data.DpsEnrollmentGroupId
         };
         return Page();
     }
@@ -39,4 +40,6 @@ public class DpsDeviceData
     public string? Name { get; set; }
 
     public string? Password { get; set; }  
+
+    public int? DpsEnrollmentGroup { get; set; }
 }
