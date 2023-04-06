@@ -12,7 +12,7 @@ public class CreateDpsEnrollmentGroupDeviceModel : PageModel
     private readonly DpsRegisterDeviceProvider _dpsRegisterDeviceProvider;
 
     [BindProperty]
-    public string? Message { get; set; }
+    public string? Message { get; set; } = null;
 
     [BindProperty]
     public int? DeviceId { get; set; }
@@ -56,7 +56,8 @@ public class CreateDpsEnrollmentGroupDeviceModel : PageModel
         }
 
         var result = await _dpsRegisterDeviceProvider.RegisterDeviceAsync(Name!, DpsEnrollmentGroup);
-        Message = $"{result.ErrorMessage}";
+        
+        if(result.ErrorMessage!= null) Message = $"{result.ErrorMessage}";
         DeviceId  = result.DeviceId;
 
         await GetSelectItems();
