@@ -40,3 +40,7 @@ https://github.com/damienbod/AspNetCoreCertificates
 https://damienbod.com/2020/01/29/creating-certificates-for-x-509-security-in-azure-iot-hub-using-net-core/
 
 https://learn.microsoft.com/en-us/azure/iot-hub/troubleshoot-error-codes
+
+https://stackoverflow.com/questions/52750160/what-is-the-rationale-for-all-the-different-x509keystorageflags/52840537#52840537
+
+https://github.com/dotnet/runtime/issues/19581
