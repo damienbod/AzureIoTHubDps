@@ -96,8 +96,7 @@ public class DpsRegisterDeviceProvider
         var newItem = new Model.DpsEnrollmentDevice
         {
             Password = password,
-            PemPublicKey = $"{_pathToCerts}{commonNameDeviceId}.pfx",
-            PemPrivateKey = deviceCertPrivatePem,
+            PathToPfx = $"{_pathToCerts}{commonNameDeviceId}.pfx",
             Name = commonNameDeviceId,
             DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
             DpsEnrollmentGroup = dpsEnrollmentGroup

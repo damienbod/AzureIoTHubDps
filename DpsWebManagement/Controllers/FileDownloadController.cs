@@ -40,27 +40,15 @@ public class FileDownloadController : Controller
             $"{cert.Name}.pem");
     }
 
-    [HttpPost("DpsDevicePublicPem")]
-    public async Task<IActionResult> DpsDevicePublicPemAsync([FromForm] int id)
+    [HttpPost("DpsDevicePfx")]
+    public async Task<IActionResult> DpsDevicePfxAsync([FromForm] int id)
     {
         var cert = await _dpsRegisterDeviceProvider.GetDpsDeviceAsync(id);
         if (cert == null) throw new ArgumentNullException(nameof(cert));
-        if (cert.PemPublicKey == null) throw new ArgumentNullException(nameof(cert.PemPublicKey));
+        if (cert.PathToPfx == null) throw new ArgumentNullException(nameof(cert.PathToPfx));
 
-        return File(Encoding.UTF8.GetBytes(cert.PemPublicKey),
-            "application/octet-stream",
-            $"{cert.Name}-public.pem");
-    }
-
-    [HttpPost("DpsDevicePrivateKeyPem")]
-    public async Task<IActionResult> DpsDevicePrivateKeyPemAsync([FromForm] int id)
-    {
-        var cert = await _dpsRegisterDeviceProvider.GetDpsDeviceAsync(id);
-        if (cert == null) throw new ArgumentNullException(nameof(cert));
-        if (cert.PemPrivateKey == null) throw new ArgumentNullException(nameof(cert.PemPrivateKey));
-
-        return File(Encoding.UTF8.GetBytes(cert.PemPrivateKey),
-            "application/octet-stream",
-            $"{cert.Name}-private.pem");
+        byte[] buff = File.ReadAllBytes(cert.PathToPfx);
+        return File(buff, "application/octet-stream",
+            $"{cert.Name}.pfx");
     }
 }
