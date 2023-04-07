@@ -46,10 +46,16 @@
             </div>
         </div>
 
-        <form action="/api/FileDownload/DpsDevicePfx" method="post">
-            <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-            <button type="submit" class="btn btn-link">Download Pfx</button>
-        </form>
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-12">
+                <form action="/api/FileDownload/DpsDevicePfx" method="post">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <button type="submit" style="padding-left:0" class="btn btn-link">Download PFX</button>
+                </form>
+            </div>
+        </div>
 
     </div>
 </div>
