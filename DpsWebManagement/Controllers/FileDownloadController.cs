@@ -2,7 +2,6 @@
 using DpsWebManagement.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace DpsWebManagement.Controllers;
@@ -47,7 +46,7 @@ public class FileDownloadController : Controller
         if (cert == null) throw new ArgumentNullException(nameof(cert));
         if (cert.PathToPfx == null) throw new ArgumentNullException(nameof(cert.PathToPfx));
 
-        byte[] buff = File.ReadAllBytes(cert.PathToPfx);
+        byte[] buff = System.IO.File.ReadAllBytes(cert.PathToPfx);
         return File(buff, "application/octet-stream",
             $"{cert.Name}.pfx");
     }
