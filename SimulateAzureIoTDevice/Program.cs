@@ -33,7 +33,7 @@ class Program
 
             // PFX
             var password = "1234";
-            var deviceId = "some-name"; // "testdevice01";
+            var deviceId = "coffee-mc"; // "testdevice01";
             var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", password);
 
             var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
