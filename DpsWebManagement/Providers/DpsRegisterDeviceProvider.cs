@@ -1,11 +1,11 @@
 ﻿using CertificateManager;
 using CertificateManager.Models;
 using DpsWebManagement.Providers.Model;
-using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -18,6 +18,9 @@ public class DpsRegisterDeviceProvider
     private readonly DpsDbContext _dpsDbContext;
     private readonly ImportExportCertificate _importExportCertificate;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
+
+    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+    static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
 
     public DpsRegisterDeviceProvider(IConfiguration config, 
         ILoggerFactory loggerFactory,
@@ -57,14 +60,10 @@ public class DpsRegisterDeviceProvider
         //deviceCertificate.FriendlyName = $"IoT device {commonNameDeviceId}";
 
         var deviceInPfxBytes = _importExportCertificate
-            .ExportChainedCertificatePfx("1234", deviceCertificate, dpsEnrollmentGroupCertificate);
-     
-        // Add this for manual testing
-        // File.WriteAllBytes($"{commonNameDeviceId}.pfx", deviceInPfxBytes);
+            .ExportChainedCertificatePfx(password, deviceCertificate, dpsEnrollmentGroupCertificate);
 
-        // get the public key certificate for the enrollment
-        var deviceCertPublicPem = _importExportCertificate
-            .PemExportPublicKeyCertificate(deviceCertificate);
+        File.WriteAllBytes($"{_pathToCerts}{commonNameDeviceId}.pfx", deviceInPfxBytes);
+
         var deviceCertPrivatePem = _importExportCertificate
             .PemExportPfxFullCertificate(deviceCertificate, password);
 
@@ -97,7 +96,7 @@ public class DpsRegisterDeviceProvider
         var newItem = new Model.DpsEnrollmentDevice
         {
             Password = password,
-            PemPublicKey = deviceCertPublicPem,
+            PemPublicKey = $"{_pathToCerts}{commonNameDeviceId}.pfx",
             PemPrivateKey = deviceCertPrivatePem,
             Name = commonNameDeviceId,
             DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
