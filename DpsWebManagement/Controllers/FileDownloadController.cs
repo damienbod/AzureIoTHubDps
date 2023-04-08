@@ -50,4 +50,28 @@ public class FileDownloadController : Controller
         return File(buff, "application/octet-stream",
             $"{cert.Name}.pfx");
     }
+
+    [HttpPost("DpsDevicePrivateKeyPem")]
+    public async Task<IActionResult> DpsDevicePrivateKeyPemAsync([FromForm] int id)
+    {
+        var cert = await _dpsRegisterDeviceProvider.GetDpsDeviceAsync(id);
+        if (cert == null) throw new ArgumentNullException(nameof(cert));
+        if (cert.PemPrivateKey == null) throw new ArgumentNullException(nameof(cert.PemPrivateKey));
+
+        return File(Encoding.UTF8.GetBytes(cert.PemPrivateKey),
+            "application/octet-stream",
+            $"{cert.Name}-private.pem");
+    }
+
+    [HttpPost("DpsDevicePublicKeyPem")]
+    public async Task<IActionResult> DpsDevicePublicKeyPemAsync([FromForm] int id)
+    {
+        var cert = await _dpsRegisterDeviceProvider.GetDpsDeviceAsync(id);
+        if (cert == null) throw new ArgumentNullException(nameof(cert));
+        if (cert.PemPublicKey == null) throw new ArgumentNullException(nameof(cert.PemPublicKey));
+
+        return File(Encoding.UTF8.GetBytes(cert.PemPublicKey),
+            "application/octet-stream",
+            $"{cert.Name}-public.pem");
+    }
 }
