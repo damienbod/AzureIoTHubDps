@@ -16,13 +16,13 @@ var dpsCa = cc.NewRootCertificate(
     new DistinguishedName { CommonName = "dpsCa", Country = "CH" },
     new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
     3, "dpsCa");
-dpsCa.FriendlyName = "developement root certificate";
+//dpsCa.FriendlyName = "developement root certificate";
 
 var dpsIntermediate1 = cc.NewIntermediateChainedCertificate(
     new DistinguishedName { CommonName = "dpsIntermediate1", Country = "CH" },
     new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
     2, "dpsIntermediate1", dpsCa);
-dpsIntermediate1.FriendlyName = "dpsIntermediate1 certificate";
+//dpsIntermediate1.FriendlyName = "dpsIntermediate1 certificate";
 
 var dpsIntermediate2 = cc.NewIntermediateChainedCertificate(
     new DistinguishedName { CommonName = "dpsIntermediate2", Country = "CH" },
