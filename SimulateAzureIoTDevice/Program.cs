@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using CertificateManager;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
 
 namespace SimulateAzureIoTDevice;
 
@@ -31,12 +32,30 @@ class Program
                 .AddCertificateManager().BuildServiceProvider();
             var iec = serviceProvider.GetService<ImportExportCertificate>();
 
-            // PFX
-            var password = "1234";
-            var deviceId = "coffee-mc"; // "testdevice01";
-            var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceId}.pfx", password);
+            #region pem
+            // PEM
+            var passwordPem = "wruzRnHAog3kDOVuymT6RAaE+k+2tv7bS5IykABD";
+            var deviceNamePem = "fat";
+            string pem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
+            var certTestdevice01 = iec!.PemImportCertificate(pem, passwordPem);
+   
+            string pem2 = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-privatekey2.pem");
+            var privateKey = ECDsa.Create();
+            privateKey.ImportPkcs8PrivateKey(Convert.FromBase64String(pem2), out _);
 
-            var auth = new DeviceAuthenticationWithX509Certificate(deviceId, certTestdevice01);
+            byte[] privateKeyBytes = privateKey.ExportPkcs8PrivateKey();
+
+            #endregion pem
+
+            #region pfx
+            // PFX
+            var passwordPfx = "1234";
+            var deviceNamePfx = "coffee-mc"; // "testdevice01";
+            //var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceNamePfx}.pfx", passwordPfx);
+
+            #endregion pfx
+
+            var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePfx, certTestdevice01);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
 
             if (deviceClient == null)

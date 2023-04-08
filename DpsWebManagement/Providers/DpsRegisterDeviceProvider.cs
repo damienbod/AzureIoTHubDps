@@ -5,6 +5,7 @@ using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -64,9 +65,20 @@ public class DpsRegisterDeviceProvider
 
         File.WriteAllBytes($"{_pathToCerts}{commonNameDeviceId}.pfx", deviceInPfxBytes);
 
+        // get the public key certificate for the device
+        var deviceCertPublicPem = _importExportCertificate
+            .PemExportPublicKeyCertificate(deviceCertificate);
+        File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-public.pem", deviceCertPublicPem);
+
+        using (ECDsa? ecdsa = deviceCertificate.GetECDsaPrivateKey())
+        {
+            var key = ecdsa!.ExportECPrivateKeyPem();
+            File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-private.pem", key);
+        }
+
+        // setup deviceCert 
         var deviceCertPrivatePem = _importExportCertificate
             .PemExportPfxFullCertificate(deviceCertificate, password);
-
         var deviceCert = _importExportCertificate
             .PemImportCertificate(deviceCertPrivatePem, password);
 
