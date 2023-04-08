@@ -4,7 +4,6 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using CertificateManager;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography;
 
 namespace SimulateAzureIoTDevice;
 
@@ -29,22 +28,21 @@ class Program
         try
         {
             var serviceProvider = new ServiceCollection()
-                .AddCertificateManager().BuildServiceProvider();
+                .AddCertificateManager()
+                .BuildServiceProvider();
             var iec = serviceProvider.GetService<ImportExportCertificate>();
 
             #region pem
             // PEM
             var passwordPem = "e9k5EiCB4VwKLnKUUoFt+wXcCjrrZT3ErZlNkT9h";
             var deviceNamePem = "de7";
-            string pem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
-            var certTestdevice01 = iec!.PemImportCertificate(pem);
 
             var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
             var cert = X509Certificate2.CreateFromPem(certPem, eccPem);
 
             // setup deviceCert windows store export 
-            var deviceCertPrivatePem = iec.PemExportPfxFullCertificate(cert, passwordPem);
+            var deviceCertPrivatePem = iec!.PemExportPfxFullCertificate(cert, passwordPem);
             var deviceCert = iec.PemImportCertificate(deviceCertPrivatePem, passwordPem);
 
             #endregion pem
