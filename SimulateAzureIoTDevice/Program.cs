@@ -34,8 +34,8 @@ class Program
 
             #region pem
             // PEM
-            var passwordPem = "OdI0s4DJGSFRiS/dcByy0lvaak4ZI6FnPglK0LVt";
-            var deviceNamePem = "de5";
+            var passwordPem = "e9k5EiCB4VwKLnKUUoFt+wXcCjrrZT3ErZlNkT9h";
+            var deviceNamePem = "de7";
             string pem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var certTestdevice01 = iec!.PemImportCertificate(pem);
 
@@ -43,19 +43,17 @@ class Program
             var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
             var cert = X509Certificate2.CreateFromPem(certPem, eccPem);
 
-            // setup deviceCert 
-            var deviceCertPrivatePem = iec
-                .PemExportPfxFullCertificate(cert, passwordPem);
-            var deviceCert = iec
-                .PemImportCertificate(deviceCertPrivatePem, passwordPem);
+            // setup deviceCert windows store export 
+            var deviceCertPrivatePem = iec.PemExportPfxFullCertificate(cert, passwordPem);
+            var deviceCert = iec.PemImportCertificate(deviceCertPrivatePem, passwordPem);
 
             #endregion pem
 
             #region pfx
             // PFX
-            var passwordPfx = "OdI0s4DJGSFRiS/dcByy0lvaak4ZI6FnPglK0LVt";
-            var deviceNamePfx = "de5"; // "testdevice01";
-            var certTestdevicePfx = new X509Certificate2($"{_pathToCerts}{deviceNamePfx}.pfx", passwordPfx);
+            //var passwordPfx = "OdI0s4DJGSFRiS/dcByy0lvaak4ZI6FnPglK0LVt";
+            //var deviceNamePfx = "de5"; // "testdevice01";
+            //var certTestdevicePfx = new X509Certificate2($"{_pathToCerts}{deviceNamePfx}.pfx", passwordPfx);
 
             #endregion pfx
 
