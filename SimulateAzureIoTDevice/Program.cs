@@ -34,16 +34,10 @@ class Program
 
             #region pem
             // PEM
-            var passwordPem = "5XXeNXQHYxi/1EPYserugaIGwRTwCua6RNz5WJo1";
-            var deviceNamePem = "measure-mc";
+            var passwordPem = "OdI0s4DJGSFRiS/dcByy0lvaak4ZI6FnPglK0LVt";
+            var deviceNamePem = "de5";
             string pem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var certTestdevice01 = iec!.PemImportCertificate(pem);
-   
-            string pem2 = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-key.pem");
-            var privateKey = ECDsa.Create();
-            privateKey.ImportECPrivateKey(Convert.FromBase64String(pem2), out _);
-
-            byte[] privateKeyBytes = privateKey.ExportPkcs8PrivateKey();
 
             var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
@@ -59,13 +53,13 @@ class Program
 
             #region pfx
             // PFX
-            var passwordPfx = "1234";
-            var deviceNamePfx = "coffee-mc"; // "testdevice01";
-            //var certTestdevice01 = new X509Certificate2($"{_pathToCerts}{deviceNamePfx}.pfx", passwordPfx);
+            var passwordPfx = "OdI0s4DJGSFRiS/dcByy0lvaak4ZI6FnPglK0LVt";
+            var deviceNamePfx = "de5"; // "testdevice01";
+            var certTestdevicePfx = new X509Certificate2($"{_pathToCerts}{deviceNamePfx}.pfx", passwordPfx);
 
             #endregion pfx
 
-            var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePfx, deviceCert);
+            var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePem, deviceCert);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
 
             if (deviceClient == null)
@@ -100,7 +94,16 @@ class Program
             eventMessage.Properties.Add("temperatureAlert", (temperature > TEMPERATURE_THRESHOLD) ? "true" : "false");
             Console.WriteLine("\t{0}> Sending message: {1}, Data: [{2}]", DateTime.Now.ToLocalTime(), count, dataBuffer);
 
-            await deviceClient.SendEventAsync(eventMessage);
+            try
+            {
+
+                await deviceClient.SendEventAsync(eventMessage);
+            }
+            catch (Exception ex)
+            {
+                var shit = ex.Message;
+            }
+           
         }
     }
 }
