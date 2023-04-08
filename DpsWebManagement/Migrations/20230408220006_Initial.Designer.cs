@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DpsWebManagement.Migrations
 {
     [DbContext(typeof(DpsDbContext))]
-    [Migration("20230401195823_new-field")]
-    partial class newfield
+    [Migration("20230408220006_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,9 +33,6 @@ namespace DpsWebManagement.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PemPrivateKey")
@@ -63,6 +60,12 @@ namespace DpsWebManagement.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PathToPfx")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PemPrivateKey")
                         .HasColumnType("nvarchar(max)");
 
@@ -88,6 +91,7 @@ namespace DpsWebManagement.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PemPrivateKey")

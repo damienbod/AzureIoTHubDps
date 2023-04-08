@@ -5,7 +5,7 @@
 namespace DpsWebManagement.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,10 +31,10 @@ namespace DpsWebManagement.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DpsCertificateId = table.Column<int>(type: "int", nullable: false),
                     PemPrivateKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PemPublicKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DpsCertificateId = table.Column<int>(type: "int", nullable: false)
+                    PemPublicKey = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -54,8 +54,10 @@ namespace DpsWebManagement.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PathToPfx = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PemPrivateKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PemPublicKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DpsEnrollmentGroupId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
