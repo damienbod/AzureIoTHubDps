@@ -45,32 +45,32 @@ public class DpsRegisterDeviceProvider
         var certDpsEnrollmentGroup = X509Certificate2.CreateFromPem(
             dpsEnrollmentGroup!.PemPublicKey, dpsEnrollmentGroup.PemPrivateKey);
 
-        var deviceCertificate = _createCertsService.NewDeviceChainedCertificate(
+        var certDevice = _createCertsService.NewDeviceChainedCertificate(
           new DistinguishedName { CommonName = $"{deviceCommonNameDevice}" },
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
           $"{deviceCommonNameDevice}", certDpsEnrollmentGroup);
 
-        var deviceInPfxBytes = _iec.ExportChainedCertificatePfx(password, deviceCertificate, certDpsEnrollmentGroup);
+        var deviceInPfxBytes = _iec.ExportChainedCertificatePfx(password, certDevice, certDpsEnrollmentGroup);
 
         // This is required if you want PFX exports to work.
         var pfxPath = FileProvider.WritePfxToDisk($"{deviceCommonNameDevice}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the device
-        var pemDeviceCertPublic = _iec.PemExportPublicKeyCertificate(deviceCertificate);
+        var pemDeviceCertPublic = _iec.PemExportPublicKeyCertificate(certDevice);
         FileProvider.WriteToDisk($"{deviceCommonNameDevice}-public.pem", pemDeviceCertPublic);
 
         string pemDeviceCertPrivateKey = string.Empty;
-        using (ECDsa? ecdsa = deviceCertificate.GetECDsaPrivateKey())
+        using (ECDsa? ecdsa = certDevice.GetECDsaPrivateKey())
         {
             pemDeviceCertPrivateKey = ecdsa!.ExportECPrivateKeyPem();
             FileProvider.WriteToDisk($"{deviceCommonNameDevice}-private.pem", pemDeviceCertPrivateKey);
         }
 
         // setup Windows store deviceCert 
-        var pemExportDevice = _iec.PemExportPfxFullCertificate(deviceCertificate, password);
-        var deviceCert = _iec.PemImportCertificate(pemExportDevice, password);
+        var pemExportDevice = _iec.PemExportPfxFullCertificate(certDevice, password);
+        var certDeviceForCreation = _iec.PemImportCertificate(pemExportDevice, password);
 
-        using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(certDpsEnrollmentGroup)))
+        using (var security = new SecurityProviderX509Certificate(certDeviceForCreation, new X509Certificate2Collection(certDpsEnrollmentGroup)))
 
         // To optimize for size, reference only the protocols used by your application.
         using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
