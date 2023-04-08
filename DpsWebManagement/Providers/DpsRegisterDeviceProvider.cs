@@ -3,7 +3,6 @@ using CertificateManager.Models;
 using DpsWebManagement.Providers.Model;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
-using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -32,10 +31,6 @@ public class DpsRegisterDeviceProvider
         _createCertsService = createCertificatesClientServerAuth;
     }
 
-    /// <summary>
-    /// transport exception if the Common Name "CN=" value within the device x.509 certificate does not match the Group Enrollment name within DPS.
-    /// https://github.com/Azure/azure-iot-sdk-c/blob/main/tools/CACertificates/CACertificateOverview.md
-    /// </summary>
     public async Task<(int? DeviceId, string? ErrorMessage)> RegisterDeviceAsync(
         string deviceCommonNameDevice, string dpsEnrollmentGroupId)
     {
@@ -47,40 +42,40 @@ public class DpsRegisterDeviceProvider
         var dpsEnrollmentGroup = _dpsDbContext.DpsEnrollmentGroups
            .FirstOrDefault(t => t.Id == int.Parse(dpsEnrollmentGroupId));
 
-        var dpsEnrollmentGroupCert = X509Certificate2.CreateFromPem(
+        var certDpsEnrollmentGroup = X509Certificate2.CreateFromPem(
             dpsEnrollmentGroup!.PemPublicKey, dpsEnrollmentGroup.PemPrivateKey);
 
         var deviceCertificate = _createCertsService.NewDeviceChainedCertificate(
           new DistinguishedName { CommonName = $"{deviceCommonNameDevice}" },
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
-          $"{deviceCommonNameDevice}", dpsEnrollmentGroupCert);
+          $"{deviceCommonNameDevice}", certDpsEnrollmentGroup);
         //deviceCertificate.FriendlyName = $"IoT device {deviceCommonNameDevice}";
 
         var deviceInPfxBytes = _importExportCertificate
-            .ExportChainedCertificatePfx(password, deviceCertificate, dpsEnrollmentGroupCert);
+            .ExportChainedCertificatePfx(password, deviceCertificate, certDpsEnrollmentGroup);
 
         // This is required if you want PFX exports to work.
         var pfxPath = FileProvider.WritePfxToDisk($"{deviceCommonNameDevice}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the device
-        var deviceCertPublicPem = _importExportCertificate
+        var pemDeviceCertPublic = _importExportCertificate
             .PemExportPublicKeyCertificate(deviceCertificate);
-        FileProvider.WriteToDisk($"{deviceCommonNameDevice}-public.pem", deviceCertPublicPem);
+        FileProvider.WriteToDisk($"{deviceCommonNameDevice}-public.pem", pemDeviceCertPublic);
 
-        string deviceCertPrivateKeyPem = string.Empty;
+        string pemDeviceCertPrivateKey = string.Empty;
         using (ECDsa? ecdsa = deviceCertificate.GetECDsaPrivateKey())
         {
-            deviceCertPrivateKeyPem = ecdsa!.ExportECPrivateKeyPem();
-            FileProvider.WriteToDisk($"{deviceCommonNameDevice}-private.pem", deviceCertPrivateKeyPem);
+            pemDeviceCertPrivateKey = ecdsa!.ExportECPrivateKeyPem();
+            FileProvider.WriteToDisk($"{deviceCommonNameDevice}-private.pem", pemDeviceCertPrivateKey);
         }
 
         // setup Windows store deviceCert 
-        var exportDevice = _importExportCertificate
+        var pemExportDevice = _importExportCertificate
             .PemExportPfxFullCertificate(deviceCertificate, password);
         var deviceCert = _importExportCertificate
-            .PemImportCertificate(exportDevice, password);
+            .PemImportCertificate(pemExportDevice, password);
 
-        using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(dpsEnrollmentGroupCert)))
+        using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(certDpsEnrollmentGroup)))
 
         // To optimize for size, reference only the protocols used by your application.
         using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
@@ -107,8 +102,8 @@ public class DpsRegisterDeviceProvider
         {
             Password = password,
             PathToPfx = pfxPath,
-            PemPrivateKey = deviceCertPrivateKeyPem,
-            PemPublicKey = deviceCertPublicPem,
+            PemPrivateKey = pemDeviceCertPrivateKey,
+            PemPublicKey = pemDeviceCertPublic,
             Name = deviceCommonNameDevice,
             DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
             DpsEnrollmentGroup = dpsEnrollmentGroup

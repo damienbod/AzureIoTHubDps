@@ -35,42 +35,37 @@ public class DpsEnrollmentGroupProvider
     }
 
     public async Task<(string Name, int Id)> CreateDpsEnrollmentGroupAsync(
-        string enrollmentGroupName,
-        string certificatePublicPemId)
+        string enrollmentGroupName, string certificatePublicPemId)
     {
         _logger.LogInformation("Starting CreateDpsEnrollmentGroupAsync...");
         _logger.LogInformation("Creating a new enrollmentGroup...");
 
-        var dpsCert = _dpsDbContext.DpsCertificates
+        var dpsCertificate = _dpsDbContext.DpsCertificates
             .FirstOrDefault(t => t.Id == int.Parse(certificatePublicPemId));
 
         var rootCertificate = X509Certificate2.CreateFromPem(
-               dpsCert!.PemPublicKey,
-               dpsCert.PemPrivateKey);
+               dpsCertificate!.PemPublicKey,
+               dpsCertificate.PemPrivateKey);
 
         // create an intermediate for each group
         var certName = $"{enrollmentGroupName}";
-        var dpsGroup = _createCertsService.NewIntermediateChainedCertificate(
+        var certDpsGroup = _createCertsService.NewIntermediateChainedCertificate(
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
             2, certName, rootCertificate);
-        //dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
 
         // get the public key certificate for the enrollment
-        var dpsGroupPublicPem = _importExportCert
-            .PemExportPublicKeyCertificate(dpsGroup);
+        var pemDpsGroupPublic = _importExportCert
+            .PemExportPublicKeyCertificate(certDpsGroup);
 
-        string dpsGroupPrivatePem = string.Empty;
-        using (ECDsa? ecdsa = dpsGroup.GetECDsaPrivateKey())
+        string pemDpsGroupPrivate = string.Empty;
+        using (ECDsa? ecdsa = certDpsGroup.GetECDsaPrivateKey())
         {
-            dpsGroupPrivatePem = ecdsa!.ExportECPrivateKeyPem();
-            FileProvider.WriteToDisk($"{enrollmentGroupName}-private.pem", dpsGroupPrivatePem);
+            pemDpsGroupPrivate = ecdsa!.ExportECPrivateKeyPem();
+            FileProvider.WriteToDisk($"{enrollmentGroupName}-private.pem", pemDpsGroupPrivate);
         }
 
-        var dpsIntermediateGroupPublic = _importExportCert
-            .PemImportCertificate(dpsGroupPublicPem);
-
-        Attestation attestation = X509Attestation.CreateFromRootCertificates(dpsGroupPublicPem);
+        Attestation attestation = X509Attestation.CreateFromRootCertificates(pemDpsGroupPublic);
         var enrollmentGroup = new EnrollmentGroup(enrollmentGroupName, attestation)
         {
             ProvisioningStatus = ProvisioningStatus.Enabled,
@@ -99,15 +94,15 @@ public class DpsEnrollmentGroupProvider
 
         var newItem = new Model.DpsEnrollmentGroup
         {
-            DpsCertificateId = dpsCert.Id,
+            DpsCertificateId = dpsCertificate.Id,
             Name = enrollmentGroupName, 
-            DpsCertificate = dpsCert,
-            PemPublicKey = dpsGroupPublicPem,
-            PemPrivateKey = dpsGroupPrivatePem
+            DpsCertificate = dpsCertificate,
+            PemPublicKey = pemDpsGroupPublic,
+            PemPrivateKey = pemDpsGroupPrivate
         };
         _dpsDbContext.DpsEnrollmentGroups.Add(newItem);
 
-        dpsCert.DpsEnrollmentGroups.Add(newItem);
+        dpsCertificate.DpsEnrollmentGroups.Add(newItem);
 
         await _dpsDbContext.SaveChangesAsync();
 
