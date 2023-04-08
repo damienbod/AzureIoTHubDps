@@ -94,7 +94,6 @@ class Program
 
             try
             {
-
                 await deviceClient.SendEventAsync(eventMessage);
             }
             catch (Exception ex)
