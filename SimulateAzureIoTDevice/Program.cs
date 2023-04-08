@@ -34,14 +34,14 @@ class Program
 
             #region pem
             // PEM
-            var passwordPem = "wruzRnHAog3kDOVuymT6RAaE+k+2tv7bS5IykABD";
-            var deviceNamePem = "fat";
+            var passwordPem = "5XXeNXQHYxi/1EPYserugaIGwRTwCua6RNz5WJo1";
+            var deviceNamePem = "measure-mc";
             string pem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
-            var certTestdevice01 = iec!.PemImportCertificate(pem, passwordPem);
+            var certTestdevice01 = iec!.PemImportCertificate(pem);
    
-            string pem2 = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-privatekey2.pem");
+            string pem2 = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-key.pem");
             var privateKey = ECDsa.Create();
-            privateKey.ImportPkcs8PrivateKey(Convert.FromBase64String(pem2), out _);
+            privateKey.ImportECPrivateKey(Convert.FromBase64String(pem2), out _);
 
             byte[] privateKeyBytes = privateKey.ExportPkcs8PrivateKey();
 
