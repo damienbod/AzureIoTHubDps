@@ -90,7 +90,7 @@ public class DpsRegisterDeviceProvider
         using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
         //using (var transport = new ProvisioningTransportHandlerHttp())
         //using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.TcpOnly))
-        // using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.WebSocketOnly))
+        //using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.WebSocketOnly))
         {
             var client = ProvisioningDeviceClient
                 .Create("global.azure-devices-provisioning.net", scopeId, security, transport);

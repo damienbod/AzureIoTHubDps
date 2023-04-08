@@ -2,7 +2,9 @@
 using CertificateManager.Models;
 using DpsWebManagement.Providers.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DpsWebManagement.Providers;
 
@@ -11,6 +13,9 @@ public class DpsCertificateProvider
     private readonly CreateCertificatesClientServerAuth _createCertificatesClientServerAuth;
     private readonly ImportExportCertificate _importExportCertificate;
     private readonly DpsDbContext _dpsDbContext;
+
+    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
+    static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
 
     public DpsCertificateProvider(CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
         ImportExportCertificate importExportCertificate,
@@ -23,7 +28,6 @@ public class DpsCertificateProvider
 
     public async Task<(string PublicPem, int Id)> CreateCertificateForDpsAsync(string certName)
     {
-        var password = GetEncodedRandomString(30);
         var dpsCertificate = _createCertificatesClientServerAuth.NewRootCertificate(
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
@@ -31,20 +35,19 @@ public class DpsCertificateProvider
         //dpsCertificate.FriendlyName = "DPS group root certificate";
 
         var publicKeyPem = _importExportCertificate.PemExportPublicKeyCertificate(dpsCertificate);
-        var privateKeyPem = _importExportCertificate.PemExportPfxFullCertificate(dpsCertificate, password);
 
-        //var rootCertInPfxBtyes = _importExportCertificate.ExportRootPfx(password, dpsCertificate);
-        //File.WriteAllBytes($"{certName}.pfx", rootCertInPfxBtyes);
-
-        //var dpsCaPEM = _importExportCertificate.PemExportPublicKeyCertificate(dpsCertificate);
-        //File.WriteAllText($"{certName}.pem", dpsCaPEM);
-
-        var item = new Model.DpsCertificate
+        string privateKeyPem = string.Empty;
+        using (ECDsa? ecdsa = dpsCertificate.GetECDsaPrivateKey())
+        {
+            privateKeyPem = ecdsa!.ExportECPrivateKeyPem();
+            File.WriteAllText($"{_pathToCerts}{certName}-private.pem", privateKeyPem);
+        }
+ 
+        var item = new DpsCertificate
         {
             Name = certName,
             PemPrivateKey = privateKeyPem,
-            PemPublicKey = publicKeyPem,
-            Password = password
+            PemPublicKey = publicKeyPem
         };
 
         _dpsDbContext.DpsCertificates.Add(item);
@@ -62,18 +65,5 @@ public class DpsCertificateProvider
     public async Task<DpsCertificate?> GetDpsCertificateAsync(int id)
     {
         return await _dpsDbContext.DpsCertificates.FirstOrDefaultAsync(item => item.Id == id);
-    }
-
-    private string GetEncodedRandomString(int length)
-    {
-        var base64 = Convert.ToBase64String(GenerateRandomBytes(length));
-        return base64;
-    }
-
-    private static byte[] GenerateRandomBytes(int length)
-    {
-        var byteArray = new byte[length];
-        RandomNumberGenerator.Fill(byteArray);
-        return byteArray;
     }
 }

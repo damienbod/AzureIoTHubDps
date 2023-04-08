@@ -4,7 +4,6 @@ using DpsWebManagement.Providers.Model;
 using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -49,8 +48,9 @@ public class DpsEnrollmentGroupProvider
         var dpsCert = _dpsDbContext.DpsCertificates
             .FirstOrDefault(t => t.Id == int.Parse(certificatePublicPemId));
 
-        var rootCertificate = _importExportCertificate
-            .PemImportCertificate(dpsCert!.PemPrivateKey, dpsCert.Password);
+        var rootCertificate = X509Certificate2.CreateFromPem(
+               dpsCert!.PemPublicKey,
+               dpsCert.PemPrivateKey);
 
         // create an intermediate for each group
         var certName = $"{enrollmentGroupId}";
@@ -60,7 +60,6 @@ public class DpsEnrollmentGroupProvider
             2, certName, rootCertificate);
         //dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
 
-        var password = GetEncodedRandomString(30);
         // get the public key certificate for the enrollment
         var dpsIntermediateGroupPublicPem = _importExportCertificate
             .PemExportPublicKeyCertificate(dpsIntermediateGroup);
@@ -108,7 +107,6 @@ public class DpsEnrollmentGroupProvider
             DpsCertificateId = dpsCert.Id,
             Name = enrollmentGroupId, 
             DpsCertificate = dpsCert,
-            Password = password,
             PemPublicKey = dpsIntermediateGroupPublicPem,
             PemPrivateKey = dpsIntermediateGroupPrivatePem
         };
@@ -132,45 +130,12 @@ public class DpsEnrollmentGroupProvider
         }
     }
 
-    public async Task QueryEnrollmentGroupAsync()
-    {
-        _logger.LogInformation("Creating a query for enrollmentGroups...");
-        var querySpecification = new QuerySpecification("SELECT * FROM enrollmentGroups");
-        using (Query query = _provisioningServiceClient.CreateEnrollmentGroupQuery(querySpecification))
-        {
-            while (query.HasNext())
-            {
-                _logger.LogInformation("Querying the next enrollmentGroups...");
-                QueryResult queryResult = await query.NextAsync();
-                _logger.LogInformation("{queryResult}", queryResult);
-
-                foreach (EnrollmentGroup group in queryResult.Items)
-                {
-                    await EnumerateRegistrationsInGroup(querySpecification, group);
-                }
-            }
-        }
-    }
-
     public async Task<List<DpsEnrollmentGroup>> GetDpsGroupsAsync(int? certificateId = null)
     {
         if (certificateId == null)
             return await _dpsDbContext.DpsEnrollmentGroups.ToListAsync();
 
         return await _dpsDbContext.DpsEnrollmentGroups.Where(s => s.DpsCertificateId == certificateId).ToListAsync();
-    }
-
-    private string GetEncodedRandomString(int length)
-    {
-        var base64 = Convert.ToBase64String(GenerateRandomBytes(length));
-        return base64;
-    }
-
-    private static byte[] GenerateRandomBytes(int length)
-    {
-        var byteArray = new byte[length];
-        RandomNumberGenerator.Fill(byteArray);
-        return byteArray;
     }
 
     public async Task<DpsEnrollmentGroup?> GetDpsGroupAsync(int id)
