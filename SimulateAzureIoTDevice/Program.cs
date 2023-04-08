@@ -13,7 +13,6 @@ class Program
     static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
 
     // Define the device
-    private static readonly string deviceId = "testdevice01";
     private static readonly string iotHubUrl = "damienbod-iothub.azure-devices.net";
     private static readonly TransportType transportType = TransportType.Amqp;
 
@@ -33,7 +32,7 @@ class Program
             var iec = serviceProvider.GetService<ImportExportCertificate>();
 
             #region pem
-            // PEM
+
             var deviceNamePem = "grinder1";
 
             var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
@@ -47,11 +46,9 @@ class Program
             #endregion pem
 
             #region pfx
-            // PFX
-            //var passwordPfx = "OdI0s4DJGSFRiS/dcByy0lvaak4ZI6FnPglK0LVt";
+            //var passwordPfx = "OdI0s4DJGSFRiS/dcByy0lvaak4jI6FnPglK0LVt";
             //var deviceNamePfx = "de5"; // "testdevice01";
             //var certTestdevicePfx = new X509Certificate2($"{_pathToCerts}{deviceNamePfx}.pfx", passwordPfx);
-
             #endregion pfx
 
             var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePem, deviceCert);
@@ -77,6 +74,7 @@ class Program
 
     static async Task SendEvent(DeviceClient deviceClient)
     {
+        var deviceName = "simi1";
         string dataBuffer;
         Console.WriteLine("Device sending {0} messages to IoTHub...\n", MESSAGE_COUNT);
 
@@ -84,7 +82,7 @@ class Program
         {
             temperature = rnd.Next(20, 35);
             humidity = rnd.Next(60, 80);
-            dataBuffer = string.Format("{{\"deviceId\":\"{0}\",\"messageId\":{1},\"temperature\":{2},\"humidity\":{3}}}", deviceId, count, temperature, humidity);
+            dataBuffer = string.Format("{{\"deviceId\":\"{0}\",\"messageId\":{1},\"temperature\":{2},\"humidity\":{3}}}", deviceName, count, temperature, humidity);
             var eventMessage = new Message(Encoding.UTF8.GetBytes(dataBuffer));
             eventMessage.Properties.Add("temperatureAlert", (temperature > TEMPERATURE_THRESHOLD) ? "true" : "false");
             Console.WriteLine("\t{0}> Sending message: {1}, Data: [{2}]", DateTime.Now.ToLocalTime(), count, dataBuffer);
@@ -95,7 +93,7 @@ class Program
             }
             catch (Exception ex)
             {
-                var exMessage = ex.Message;
+                Console.WriteLine("Error in SendEventAsync: {0}", ex.Message);
             } 
         }
     }
