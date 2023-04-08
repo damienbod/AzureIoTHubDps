@@ -40,7 +40,7 @@ public class DpsCertificateProvider
         using (ECDsa? ecdsa = dpsCertificate.GetECDsaPrivateKey())
         {
             privateKeyPem = ecdsa!.ExportECPrivateKeyPem();
-            File.WriteAllText($"{_pathToCerts}{certName}-private.pem", privateKeyPem);
+            //File.WriteAllText($"{_pathToCerts}{certName}-private.pem", privateKeyPem);
         }
  
         var item = new DpsCertificate

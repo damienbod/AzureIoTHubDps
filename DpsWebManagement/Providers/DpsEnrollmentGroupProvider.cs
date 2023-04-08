@@ -68,8 +68,7 @@ public class DpsEnrollmentGroupProvider
         using (ECDsa? ecdsa = dpsIntermediateGroup.GetECDsaPrivateKey())
         {
             dpsIntermediateGroupPrivatePem = ecdsa!.ExportECPrivateKeyPem();
-            File.WriteAllText($"{_pathToCerts}{enrollmentGroupId}-private.pem", 
-                dpsIntermediateGroupPrivatePem);
+            // File.WriteAllText($"{_pathToCerts}{enrollmentGroupId}-private.pem",  dpsIntermediateGroupPrivatePem);
         }
 
         var dpsIntermediateGroupPublic = _importExportCertificate

@@ -34,16 +34,15 @@ class Program
 
             #region pem
             // PEM
-            var passwordPem = "e9k5EiCB4VwKLnKUUoFt+wXcCjrrZT3ErZlNkT9h";
-            var deviceNamePem = "de7";
+            var deviceNamePem = "grinder1";
 
             var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
             var cert = X509Certificate2.CreateFromPem(certPem, eccPem);
 
             // setup deviceCert windows store export 
-            var deviceCertPrivatePem = iec!.PemExportPfxFullCertificate(cert, passwordPem);
-            var deviceCert = iec.PemImportCertificate(deviceCertPrivatePem, passwordPem);
+            var deviceCertPrivatePem = iec!.PemExportPfxFullCertificate(cert);
+            var deviceCert = iec.PemImportCertificate(deviceCertPrivatePem);
 
             #endregion pem
 
@@ -96,9 +95,8 @@ class Program
             }
             catch (Exception ex)
             {
-                var shit = ex.Message;
-            }
-           
+                var exMessage = ex.Message;
+            } 
         }
     }
 }
