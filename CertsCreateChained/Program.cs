@@ -28,7 +28,7 @@ var dpsIntermediate2 = cc.NewIntermediateChainedCertificate(
     new DistinguishedName { CommonName = "dpsIntermediate2", Country = "CH" },
     new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
     2, "dpsIntermediate2", dpsCa);
-dpsIntermediate2.FriendlyName = "dpsIntermediate2 certificate";
+//dpsIntermediate2.FriendlyName = "dpsIntermediate2 certificate";
 
 // EXPORTS PFX
 
