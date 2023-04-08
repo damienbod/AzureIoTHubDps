@@ -70,17 +70,18 @@ public class DpsRegisterDeviceProvider
             .PemExportPublicKeyCertificate(deviceCertificate);
         File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-public.pem", deviceCertPublicPem);
 
+        string deviceCertPrivateKeyPem = string.Empty;
         using (ECDsa? ecdsa = deviceCertificate.GetECDsaPrivateKey())
         {
-            var key = ecdsa!.ExportECPrivateKeyPem();
-            File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-private.pem", key);
+            deviceCertPrivateKeyPem = ecdsa!.ExportECPrivateKeyPem();
+            File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-private.pem", deviceCertPrivateKeyPem);
         }
 
-        // setup deviceCert 
-        var deviceCertPrivatePem = _importExportCertificate
+        // setup Windows store deviceCert 
+        var exportDevice = _importExportCertificate
             .PemExportPfxFullCertificate(deviceCertificate, password);
         var deviceCert = _importExportCertificate
-            .PemImportCertificate(deviceCertPrivatePem, password);
+            .PemImportCertificate(exportDevice, password);
 
         using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(dpsEnrollmentGroupCertificate)))
 
@@ -109,6 +110,8 @@ public class DpsRegisterDeviceProvider
         {
             Password = password,
             PathToPfx = $"{_pathToCerts}{commonNameDeviceId}.pfx",
+            PemPrivateKey = deviceCertPrivateKeyPem,
+            PemPublicKey = deviceCertPublicPem,
             Name = commonNameDeviceId,
             DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
             DpsEnrollmentGroup = dpsEnrollmentGroup
