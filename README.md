@@ -29,6 +29,8 @@ Update-Database
 
 ## History
 
+2023-04-08 Add PKI web application for Azure IoT Hub DPS using DPS enrollment groups and certificates
+
 2023-03-27 Updated to .NET 7, fix group and individual enrollments
 
 ## Links
