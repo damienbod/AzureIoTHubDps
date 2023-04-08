@@ -3,9 +3,9 @@ using CertificateManager.Models;
 using DpsWebManagement.Providers.Model;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
+using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -18,9 +18,6 @@ public class DpsRegisterDeviceProvider
     private readonly DpsDbContext _dpsDbContext;
     private readonly ImportExportCertificate _importExportCertificate;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
-
-    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
-    static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
 
     public DpsRegisterDeviceProvider(IConfiguration config, 
         ILoggerFactory loggerFactory,
@@ -40,42 +37,41 @@ public class DpsRegisterDeviceProvider
     /// https://github.com/Azure/azure-iot-sdk-c/blob/main/tools/CACertificates/CACertificateOverview.md
     /// </summary>
     public async Task<(int? DeviceId, string? ErrorMessage)> RegisterDeviceAsync(
-        string commonNameDeviceId, string dpsEnrollmentGroupId)
+        string deviceCommonNameDevice, string dpsEnrollmentGroupId)
     {
         int? deviceId = null;
         var scopeId = Configuration["ScopeId"];
         string? password = GetEncodedRandomString(30);
-        commonNameDeviceId = commonNameDeviceId.ToLower();
+        deviceCommonNameDevice = deviceCommonNameDevice.ToLower();
 
         var dpsEnrollmentGroup = _dpsDbContext.DpsEnrollmentGroups
            .FirstOrDefault(t => t.Id == int.Parse(dpsEnrollmentGroupId));
 
-        var dpsEnrollmentGroupCertificate = X509Certificate2.CreateFromPem(
-                dpsEnrollmentGroup!.PemPublicKey, 
-                dpsEnrollmentGroup.PemPrivateKey);
+        var dpsEnrollmentGroupCert = X509Certificate2.CreateFromPem(
+            dpsEnrollmentGroup!.PemPublicKey, dpsEnrollmentGroup.PemPrivateKey);
 
         var deviceCertificate = _createCertsService.NewDeviceChainedCertificate(
-          new DistinguishedName { CommonName = $"{commonNameDeviceId}" },
+          new DistinguishedName { CommonName = $"{deviceCommonNameDevice}" },
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
-          $"{commonNameDeviceId}", dpsEnrollmentGroupCertificate);
-        //deviceCertificate.FriendlyName = $"IoT device {commonNameDeviceId}";
+          $"{deviceCommonNameDevice}", dpsEnrollmentGroupCert);
+        //deviceCertificate.FriendlyName = $"IoT device {deviceCommonNameDevice}";
 
         var deviceInPfxBytes = _importExportCertificate
-            .ExportChainedCertificatePfx(password, deviceCertificate, dpsEnrollmentGroupCertificate);
+            .ExportChainedCertificatePfx(password, deviceCertificate, dpsEnrollmentGroupCert);
 
         // This is required if you want PFX exports to work.
-        File.WriteAllBytes($"{_pathToCerts}{commonNameDeviceId}.pfx", deviceInPfxBytes);
+        var pfxPath = FileProvider.WritePfxToDisk($"{deviceCommonNameDevice}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the device
         var deviceCertPublicPem = _importExportCertificate
             .PemExportPublicKeyCertificate(deviceCertificate);
-        //File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-public.pem", deviceCertPublicPem);
+        FileProvider.WriteToDisk($"{deviceCommonNameDevice}-public.pem", deviceCertPublicPem);
 
         string deviceCertPrivateKeyPem = string.Empty;
         using (ECDsa? ecdsa = deviceCertificate.GetECDsaPrivateKey())
         {
             deviceCertPrivateKeyPem = ecdsa!.ExportECPrivateKeyPem();
-            //File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-private.pem", deviceCertPrivateKeyPem);
+            FileProvider.WriteToDisk($"{deviceCommonNameDevice}-private.pem", deviceCertPrivateKeyPem);
         }
 
         // setup Windows store deviceCert 
@@ -84,7 +80,7 @@ public class DpsRegisterDeviceProvider
         var deviceCert = _importExportCertificate
             .PemImportCertificate(exportDevice, password);
 
-        using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(dpsEnrollmentGroupCertificate)))
+        using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(dpsEnrollmentGroupCert)))
 
         // To optimize for size, reference only the protocols used by your application.
         using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
@@ -92,8 +88,8 @@ public class DpsRegisterDeviceProvider
         //using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.TcpOnly))
         //using (var transport = new ProvisioningTransportHandlerMqtt(TransportFallbackType.WebSocketOnly))
         {
-            var client = ProvisioningDeviceClient
-                .Create("global.azure-devices-provisioning.net", scopeId, security, transport);
+            var client = ProvisioningDeviceClient.Create("global.azure-devices-provisioning.net",
+                scopeId, security, transport);
 
             try
             {
@@ -107,13 +103,13 @@ public class DpsRegisterDeviceProvider
             }
         }
 
-        var newItem = new Model.DpsEnrollmentDevice
+        var newItem = new DpsEnrollmentDevice
         {
             Password = password,
-            PathToPfx = $"{_pathToCerts}{commonNameDeviceId}.pfx",
+            PathToPfx = pfxPath,
             PemPrivateKey = deviceCertPrivateKeyPem,
             PemPublicKey = deviceCertPublicPem,
-            Name = commonNameDeviceId,
+            Name = deviceCommonNameDevice,
             DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
             DpsEnrollmentGroup = dpsEnrollmentGroup
         };

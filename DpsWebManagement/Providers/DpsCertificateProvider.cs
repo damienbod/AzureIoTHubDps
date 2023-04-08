@@ -2,7 +2,6 @@
 using CertificateManager.Models;
 using DpsWebManagement.Providers.Model;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -13,9 +12,6 @@ public class DpsCertificateProvider
     private readonly CreateCertificatesClientServerAuth _createCertificatesClientServerAuth;
     private readonly ImportExportCertificate _importExportCertificate;
     private readonly DpsDbContext _dpsDbContext;
-
-    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);
-    static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
 
     public DpsCertificateProvider(CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
         ImportExportCertificate importExportCertificate,
@@ -40,7 +36,7 @@ public class DpsCertificateProvider
         using (ECDsa? ecdsa = dpsCertificate.GetECDsaPrivateKey())
         {
             privateKeyPem = ecdsa!.ExportECPrivateKeyPem();
-            //File.WriteAllText($"{_pathToCerts}{certName}-private.pem", privateKeyPem);
+            FileProvider.WriteToDisk($"{certName}-private.pem", privateKeyPem);
         }
  
         var item = new DpsCertificate

@@ -4,7 +4,6 @@ using DpsWebManagement.Providers.Model;
 using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -16,13 +15,10 @@ public class DpsEnrollmentGroupProvider
 
     private readonly ILogger<DpsEnrollmentGroupProvider> _logger;
     private readonly DpsDbContext _dpsDbContext;
-    private readonly ImportExportCertificate _importExportCertificate;
+    private readonly ImportExportCertificate _importExportCert;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
     private readonly ProvisioningServiceClient _provisioningServiceClient;
     
-    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);   
-    static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
-
     public DpsEnrollmentGroupProvider(IConfiguration config, ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
         CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
@@ -31,7 +27,7 @@ public class DpsEnrollmentGroupProvider
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsEnrollmentGroupProvider>();
         _dpsDbContext = dpsDbContext;
-        _importExportCertificate = importExportCertificate;
+        _importExportCert = importExportCertificate;
         _createCertsService = createCertificatesClientServerAuth;
 
         _provisioningServiceClient = ProvisioningServiceClient.CreateFromConnectionString(
@@ -54,27 +50,27 @@ public class DpsEnrollmentGroupProvider
 
         // create an intermediate for each group
         var certName = $"{enrollmentGroupId}";
-        var dpsIntermediateGroup = _createCertsService.NewIntermediateChainedCertificate(
+        var dpsGroup = _createCertsService.NewIntermediateChainedCertificate(
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
             2, certName, rootCertificate);
         //dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
 
         // get the public key certificate for the enrollment
-        var dpsIntermediateGroupPublicPem = _importExportCertificate
-            .PemExportPublicKeyCertificate(dpsIntermediateGroup);
+        var dpsGroupPublicPem = _importExportCert
+            .PemExportPublicKeyCertificate(dpsGroup);
 
-        string dpsIntermediateGroupPrivatePem = string.Empty;
-        using (ECDsa? ecdsa = dpsIntermediateGroup.GetECDsaPrivateKey())
+        string dpsGroupPrivatePem = string.Empty;
+        using (ECDsa? ecdsa = dpsGroup.GetECDsaPrivateKey())
         {
-            dpsIntermediateGroupPrivatePem = ecdsa!.ExportECPrivateKeyPem();
-            // File.WriteAllText($"{_pathToCerts}{enrollmentGroupId}-private.pem",  dpsIntermediateGroupPrivatePem);
+            dpsGroupPrivatePem = ecdsa!.ExportECPrivateKeyPem();
+            FileProvider.WriteToDisk($"{enrollmentGroupId}-private.pem", dpsGroupPrivatePem);
         }
 
-        var dpsIntermediateGroupPublic = _importExportCertificate
-            .PemImportCertificate(dpsIntermediateGroupPublicPem);
+        var dpsIntermediateGroupPublic = _importExportCert
+            .PemImportCertificate(dpsGroupPublicPem);
 
-        Attestation attestation = X509Attestation.CreateFromRootCertificates(dpsIntermediateGroupPublicPem);
+        Attestation attestation = X509Attestation.CreateFromRootCertificates(dpsGroupPublicPem);
         var enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
         {
             ProvisioningStatus = ProvisioningStatus.Enabled,
@@ -106,8 +102,8 @@ public class DpsEnrollmentGroupProvider
             DpsCertificateId = dpsCert.Id,
             Name = enrollmentGroupId, 
             DpsCertificate = dpsCert,
-            PemPublicKey = dpsIntermediateGroupPublicPem,
-            PemPrivateKey = dpsIntermediateGroupPrivatePem
+            PemPublicKey = dpsGroupPublicPem,
+            PemPrivateKey = dpsGroupPrivatePem
         };
         _dpsDbContext.DpsEnrollmentGroups.Add(newItem);
 
