@@ -50,8 +50,9 @@ public class DpsRegisterDeviceProvider
         var dpsEnrollmentGroup = _dpsDbContext.DpsEnrollmentGroups
            .FirstOrDefault(t => t.Id == int.Parse(dpsEnrollmentGroupId));
 
-        var dpsEnrollmentGroupCertificate = _importExportCertificate
-            .PemImportCertificate(dpsEnrollmentGroup!.PemPrivateKey, dpsEnrollmentGroup.Password);
+        var dpsEnrollmentGroupCertificate = X509Certificate2.CreateFromPem(
+                dpsEnrollmentGroup!.PemPublicKey, 
+                dpsEnrollmentGroup.PemPrivateKey);
 
         var deviceCertificate = _createCertsService.NewDeviceChainedCertificate(
           new DistinguishedName { CommonName = $"{commonNameDeviceId}" },
@@ -62,18 +63,19 @@ public class DpsRegisterDeviceProvider
         var deviceInPfxBytes = _importExportCertificate
             .ExportChainedCertificatePfx(password, deviceCertificate, dpsEnrollmentGroupCertificate);
 
+        // This is required if you want PFX exports to work.
         File.WriteAllBytes($"{_pathToCerts}{commonNameDeviceId}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the device
         var deviceCertPublicPem = _importExportCertificate
             .PemExportPublicKeyCertificate(deviceCertificate);
-        File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-public.pem", deviceCertPublicPem);
+        //File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-public.pem", deviceCertPublicPem);
 
         string deviceCertPrivateKeyPem = string.Empty;
         using (ECDsa? ecdsa = deviceCertificate.GetECDsaPrivateKey())
         {
             deviceCertPrivateKeyPem = ecdsa!.ExportECPrivateKeyPem();
-            File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-private.pem", deviceCertPrivateKeyPem);
+            //File.WriteAllText($"{_pathToCerts}{commonNameDeviceId}-private.pem", deviceCertPrivateKeyPem);
         }
 
         // setup Windows store deviceCert 

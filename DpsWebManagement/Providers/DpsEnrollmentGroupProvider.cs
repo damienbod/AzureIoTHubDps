@@ -4,7 +4,10 @@ using DpsWebManagement.Providers.Model;
 using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+using System.Reflection;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DpsWebManagement.Providers;
 
@@ -17,6 +20,9 @@ public class DpsEnrollmentGroupProvider
     private readonly ImportExportCertificate _importExportCertificate;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
     private readonly ProvisioningServiceClient _provisioningServiceClient;
+    
+    static readonly string? _directory = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location);   
+    static readonly string _pathToCerts = $"{_directory}\\..\\..\\..\\..\\Certs\\";
 
     public DpsEnrollmentGroupProvider(IConfiguration config, ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
@@ -58,8 +64,14 @@ public class DpsEnrollmentGroupProvider
         // get the public key certificate for the enrollment
         var dpsIntermediateGroupPublicPem = _importExportCertificate
             .PemExportPublicKeyCertificate(dpsIntermediateGroup);
-        var dpsIntermediateGroupPrivatePem = _importExportCertificate
-            .PemExportPfxFullCertificate(dpsIntermediateGroup, password);
+
+        string dpsIntermediateGroupPrivatePem = string.Empty;
+        using (ECDsa? ecdsa = dpsIntermediateGroup.GetECDsaPrivateKey())
+        {
+            dpsIntermediateGroupPrivatePem = ecdsa!.ExportECPrivateKeyPem();
+            File.WriteAllText($"{_pathToCerts}{enrollmentGroupId}-private.pem", 
+                dpsIntermediateGroupPrivatePem);
+        }
 
         var dpsIntermediateGroupPublic = _importExportCertificate
             .PemImportCertificate(dpsIntermediateGroupPublicPem);
