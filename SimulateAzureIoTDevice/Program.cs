@@ -33,7 +33,7 @@ class Program
 
             #region pem
 
-            var deviceNamePem = "grinder1";
+            var deviceNamePem = "robot1-feed";
 
             var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
