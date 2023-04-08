@@ -45,6 +45,16 @@ class Program
 
             byte[] privateKeyBytes = privateKey.ExportPkcs8PrivateKey();
 
+            var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
+            var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
+            var cert = X509Certificate2.CreateFromPem(certPem, eccPem);
+
+            // setup deviceCert 
+            var deviceCertPrivatePem = iec
+                .PemExportPfxFullCertificate(cert, passwordPem);
+            var deviceCert = iec
+                .PemImportCertificate(deviceCertPrivatePem, passwordPem);
+
             #endregion pem
 
             #region pfx
@@ -55,7 +65,7 @@ class Program
 
             #endregion pfx
 
-            var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePfx, certTestdevice01);
+            var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePfx, deviceCert);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
 
             if (deviceClient == null)
