@@ -35,7 +35,7 @@ public class DpsEnrollmentGroupProvider
     }
 
     public async Task<(string Name, int Id)> CreateDpsEnrollmentGroupAsync(
-        string enrollmentGroupId,
+        string enrollmentGroupName,
         string certificatePublicPemId)
     {
         _logger.LogInformation("Starting CreateDpsEnrollmentGroupAsync...");
@@ -49,7 +49,7 @@ public class DpsEnrollmentGroupProvider
                dpsCert.PemPrivateKey);
 
         // create an intermediate for each group
-        var certName = $"{enrollmentGroupId}";
+        var certName = $"{enrollmentGroupName}";
         var dpsGroup = _createCertsService.NewIntermediateChainedCertificate(
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
@@ -64,14 +64,14 @@ public class DpsEnrollmentGroupProvider
         using (ECDsa? ecdsa = dpsGroup.GetECDsaPrivateKey())
         {
             dpsGroupPrivatePem = ecdsa!.ExportECPrivateKeyPem();
-            FileProvider.WriteToDisk($"{enrollmentGroupId}-private.pem", dpsGroupPrivatePem);
+            FileProvider.WriteToDisk($"{enrollmentGroupName}-private.pem", dpsGroupPrivatePem);
         }
 
         var dpsIntermediateGroupPublic = _importExportCert
             .PemImportCertificate(dpsGroupPublicPem);
 
         Attestation attestation = X509Attestation.CreateFromRootCertificates(dpsGroupPublicPem);
-        var enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
+        var enrollmentGroup = new EnrollmentGroup(enrollmentGroupName, attestation)
         {
             ProvisioningStatus = ProvisioningStatus.Enabled,
             ReprovisionPolicy = new ReprovisionPolicy
@@ -100,7 +100,7 @@ public class DpsEnrollmentGroupProvider
         var newItem = new Model.DpsEnrollmentGroup
         {
             DpsCertificateId = dpsCert.Id,
-            Name = enrollmentGroupId, 
+            Name = enrollmentGroupName, 
             DpsCertificate = dpsCert,
             PemPublicKey = dpsGroupPublicPem,
             PemPrivateKey = dpsGroupPrivatePem
