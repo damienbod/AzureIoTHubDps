@@ -15,7 +15,7 @@ public class DpsRegisterDeviceProvider
     private IConfiguration Configuration { get; set; }
     private readonly ILogger<DpsRegisterDeviceProvider> _logger;
     private readonly DpsDbContext _dpsDbContext;
-    private readonly ImportExportCertificate _importExportCertificate;
+    private readonly ImportExportCertificate _iec;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
 
     public DpsRegisterDeviceProvider(IConfiguration config, 
@@ -27,7 +27,7 @@ public class DpsRegisterDeviceProvider
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsRegisterDeviceProvider>();
         _dpsDbContext = dpsDbContext;
-        _importExportCertificate = importExportCertificate;
+        _iec = importExportCertificate;
         _createCertsService = createCertificatesClientServerAuth;
     }
 
@@ -49,17 +49,14 @@ public class DpsRegisterDeviceProvider
           new DistinguishedName { CommonName = $"{deviceCommonNameDevice}" },
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
           $"{deviceCommonNameDevice}", certDpsEnrollmentGroup);
-        //deviceCertificate.FriendlyName = $"IoT device {deviceCommonNameDevice}";
 
-        var deviceInPfxBytes = _importExportCertificate
-            .ExportChainedCertificatePfx(password, deviceCertificate, certDpsEnrollmentGroup);
+        var deviceInPfxBytes = _iec.ExportChainedCertificatePfx(password, deviceCertificate, certDpsEnrollmentGroup);
 
         // This is required if you want PFX exports to work.
         var pfxPath = FileProvider.WritePfxToDisk($"{deviceCommonNameDevice}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the device
-        var pemDeviceCertPublic = _importExportCertificate
-            .PemExportPublicKeyCertificate(deviceCertificate);
+        var pemDeviceCertPublic = _iec.PemExportPublicKeyCertificate(deviceCertificate);
         FileProvider.WriteToDisk($"{deviceCommonNameDevice}-public.pem", pemDeviceCertPublic);
 
         string pemDeviceCertPrivateKey = string.Empty;
@@ -70,10 +67,8 @@ public class DpsRegisterDeviceProvider
         }
 
         // setup Windows store deviceCert 
-        var pemExportDevice = _importExportCertificate
-            .PemExportPfxFullCertificate(deviceCertificate, password);
-        var deviceCert = _importExportCertificate
-            .PemImportCertificate(pemExportDevice, password);
+        var pemExportDevice = _iec.PemExportPfxFullCertificate(deviceCertificate, password);
+        var deviceCert = _iec.PemImportCertificate(pemExportDevice, password);
 
         using (var security = new SecurityProviderX509Certificate(deviceCert, new X509Certificate2Collection(certDpsEnrollmentGroup)))
 
@@ -108,10 +103,9 @@ public class DpsRegisterDeviceProvider
             DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
             DpsEnrollmentGroup = dpsEnrollmentGroup
         };
+
         _dpsDbContext.DpsEnrollmentDevices.Add(newItem);
-
         dpsEnrollmentGroup.DpsEnrollmentDevices.Add(newItem);
-
         await _dpsDbContext.SaveChangesAsync();
 
         deviceId = newItem.Id;
@@ -134,7 +128,9 @@ public class DpsRegisterDeviceProvider
     public async Task<List<DpsEnrollmentDevice>> GetDpsDevicesAsync(int? dpsEnrollmentGroupId)
     {
         if(dpsEnrollmentGroupId == null)
+        {
             return await _dpsDbContext.DpsEnrollmentDevices.ToListAsync();
+        }
 
         return await _dpsDbContext.DpsEnrollmentDevices.Where(s => s.DpsEnrollmentGroupId == dpsEnrollmentGroupId).ToListAsync();
     }

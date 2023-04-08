@@ -15,7 +15,7 @@ public class DpsEnrollmentGroupProvider
 
     private readonly ILogger<DpsEnrollmentGroupProvider> _logger;
     private readonly DpsDbContext _dpsDbContext;
-    private readonly ImportExportCertificate _importExportCert;
+    private readonly ImportExportCertificate _iec;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
     private readonly ProvisioningServiceClient _provisioningServiceClient;
     
@@ -27,7 +27,7 @@ public class DpsEnrollmentGroupProvider
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsEnrollmentGroupProvider>();
         _dpsDbContext = dpsDbContext;
-        _importExportCert = importExportCertificate;
+        _iec = importExportCertificate;
         _createCertsService = createCertificatesClientServerAuth;
 
         _provisioningServiceClient = ProvisioningServiceClient.CreateFromConnectionString(
@@ -44,8 +44,7 @@ public class DpsEnrollmentGroupProvider
             .FirstOrDefault(t => t.Id == int.Parse(certificatePublicPemId));
 
         var rootCertificate = X509Certificate2.CreateFromPem(
-               dpsCertificate!.PemPublicKey,
-               dpsCertificate.PemPrivateKey);
+               dpsCertificate!.PemPublicKey,dpsCertificate.PemPrivateKey);
 
         // create an intermediate for each group
         var certName = $"{enrollmentGroupName}";
@@ -55,8 +54,7 @@ public class DpsEnrollmentGroupProvider
             2, certName, rootCertificate);
 
         // get the public key certificate for the enrollment
-        var pemDpsGroupPublic = _importExportCert
-            .PemExportPublicKeyCertificate(certDpsGroup);
+        var pemDpsGroupPublic = _iec.PemExportPublicKeyCertificate(certDpsGroup);
 
         string pemDpsGroupPrivate = string.Empty;
         using (ECDsa? ecdsa = certDpsGroup.GetECDsaPrivateKey())
@@ -92,7 +90,7 @@ public class DpsEnrollmentGroupProvider
         _logger.LogInformation("EnrollmentGroup created with success.");
         _logger.LogInformation("{enrollmentGroupResult}", enrollmentGroupResult);
 
-        var newItem = new Model.DpsEnrollmentGroup
+        var newItem = new DpsEnrollmentGroup
         {
             DpsCertificateId = dpsCertificate.Id,
             Name = enrollmentGroupName, 
@@ -123,9 +121,12 @@ public class DpsEnrollmentGroupProvider
     public async Task<List<DpsEnrollmentGroup>> GetDpsGroupsAsync(int? certificateId = null)
     {
         if (certificateId == null)
+        {
             return await _dpsDbContext.DpsEnrollmentGroups.ToListAsync();
+        }
 
-        return await _dpsDbContext.DpsEnrollmentGroups.Where(s => s.DpsCertificateId == certificateId).ToListAsync();
+        return await _dpsDbContext.DpsEnrollmentGroups
+            .Where(s => s.DpsCertificateId == certificateId).ToListAsync();
     }
 
     public async Task<DpsEnrollmentGroup?> GetDpsGroupAsync(int id)

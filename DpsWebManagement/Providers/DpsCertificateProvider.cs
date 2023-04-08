@@ -10,7 +10,7 @@ namespace DpsWebManagement.Providers;
 public class DpsCertificateProvider
 {
     private readonly CreateCertificatesClientServerAuth _createCertificatesClientServerAuth;
-    private readonly ImportExportCertificate _importExportCertificate;
+    private readonly ImportExportCertificate _iec;
     private readonly DpsDbContext _dpsDbContext;
 
     public DpsCertificateProvider(CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
@@ -18,31 +18,30 @@ public class DpsCertificateProvider
         DpsDbContext dpsDbContext)
     {
         _createCertificatesClientServerAuth = createCertificatesClientServerAuth;
-        _importExportCertificate = importExportCertificate;
+        _iec = importExportCertificate;
         _dpsDbContext = dpsDbContext;
     }
 
     public async Task<(string PublicPem, int Id)> CreateCertificateForDpsAsync(string certName)
     {
-        var dpsCertificate = _createCertificatesClientServerAuth.NewRootCertificate(
+        var certificateDps = _createCertificatesClientServerAuth.NewRootCertificate(
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
             3, certName);
-        //dpsCertificate.FriendlyName = "DPS group root certificate";
 
-        var publicKeyPem = _importExportCertificate.PemExportPublicKeyCertificate(dpsCertificate);
+        var publicKeyPem = _iec.PemExportPublicKeyCertificate(certificateDps);
 
-        string privateKeyPem = string.Empty;
-        using (ECDsa? ecdsa = dpsCertificate.GetECDsaPrivateKey())
+        string pemPrivateKey = string.Empty;
+        using (ECDsa? ecdsa = certificateDps.GetECDsaPrivateKey())
         {
-            privateKeyPem = ecdsa!.ExportECPrivateKeyPem();
-            FileProvider.WriteToDisk($"{certName}-private.pem", privateKeyPem);
+            pemPrivateKey = ecdsa!.ExportECPrivateKeyPem();
+            FileProvider.WriteToDisk($"{certName}-private.pem", pemPrivateKey);
         }
  
         var item = new DpsCertificate
         {
             Name = certName,
-            PemPrivateKey = privateKeyPem,
+            PemPrivateKey = pemPrivateKey,
             PemPublicKey = publicKeyPem
         };
 
