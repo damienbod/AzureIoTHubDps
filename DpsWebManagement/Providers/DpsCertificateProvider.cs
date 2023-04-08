@@ -9,22 +9,22 @@ namespace DpsWebManagement.Providers;
 
 public class DpsCertificateProvider
 {
-    private readonly CreateCertificatesClientServerAuth _createCertificatesClientServerAuth;
+    private readonly CreateCertificatesClientServerAuth _createCertsService;
     private readonly ImportExportCertificate _iec;
     private readonly DpsDbContext _dpsDbContext;
 
-    public DpsCertificateProvider(CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
+    public DpsCertificateProvider(CreateCertificatesClientServerAuth ccs,
         ImportExportCertificate importExportCertificate,
         DpsDbContext dpsDbContext)
     {
-        _createCertificatesClientServerAuth = createCertificatesClientServerAuth;
+        _createCertsService = ccs;
         _iec = importExportCertificate;
         _dpsDbContext = dpsDbContext;
     }
 
     public async Task<(string PublicPem, int Id)> CreateCertificateForDpsAsync(string certName)
     {
-        var certificateDps = _createCertificatesClientServerAuth.NewRootCertificate(
+        var certificateDps = _createCertsService.NewRootCertificate(
             new DistinguishedName { CommonName = certName, Country = "CH" },
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
             3, certName);

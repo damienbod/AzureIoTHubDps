@@ -21,14 +21,14 @@ public class DpsRegisterDeviceProvider
     public DpsRegisterDeviceProvider(IConfiguration config, 
         ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
-        CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
+        CreateCertificatesClientServerAuth ccs,
         DpsDbContext dpsDbContext)
     {
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsRegisterDeviceProvider>();
         _dpsDbContext = dpsDbContext;
         _iec = importExportCertificate;
-        _createCertsService = createCertificatesClientServerAuth;
+        _createCertsService = ccs;
     }
 
     public async Task<(int? DeviceId, string? ErrorMessage)> RegisterDeviceAsync(

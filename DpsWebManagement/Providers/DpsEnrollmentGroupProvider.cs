@@ -21,14 +21,14 @@ public class DpsEnrollmentGroupProvider
     
     public DpsEnrollmentGroupProvider(IConfiguration config, ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
-        CreateCertificatesClientServerAuth createCertificatesClientServerAuth,
+        CreateCertificatesClientServerAuth ccs,
         DpsDbContext dpsDbContext)
     {
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsEnrollmentGroupProvider>();
         _dpsDbContext = dpsDbContext;
         _iec = importExportCertificate;
-        _createCertsService = createCertificatesClientServerAuth;
+        _createCertsService = ccs;
 
         _provisioningServiceClient = ProvisioningServiceClient.CreateFromConnectionString(
                   Configuration.GetConnectionString("DpsConnection"));
