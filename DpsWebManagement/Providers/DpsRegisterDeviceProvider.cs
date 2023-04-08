@@ -112,13 +112,13 @@ public class DpsRegisterDeviceProvider
         return (deviceId, null);
     }
 
-    private string GetEncodedRandomString(int length)
+    private static string GetEncodedRandomString(int length)
     {
         var base64 = Convert.ToBase64String(GenerateRandomBytes(length));
         return base64;
     }
 
-    private byte[] GenerateRandomBytes(int length)
+    private static byte[] GenerateRandomBytes(int length)
     {
         var byteArray = new byte[length];
         RandomNumberGenerator.Fill(byteArray);

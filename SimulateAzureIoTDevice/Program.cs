@@ -40,8 +40,8 @@ class Program
             var cert = X509Certificate2.CreateFromPem(certPem, eccPem);
 
             // setup deviceCert windows store export 
-            var deviceCertPrivatePem = iec!.PemExportPfxFullCertificate(cert);
-            var deviceCert = iec.PemImportCertificate(deviceCertPrivatePem);
+            var pemDeviceCertPrivate = iec!.PemExportPfxFullCertificate(cert);
+            var certDevice = iec.PemImportCertificate(pemDeviceCertPrivate);
 
             #endregion pem
 
@@ -51,7 +51,7 @@ class Program
             //var certTestdevicePfx = new X509Certificate2($"{_pathToCerts}{deviceNamePfx}.pfx", passwordPfx);
             #endregion pfx
 
-            var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePem, deviceCert);
+            var auth = new DeviceAuthenticationWithX509Certificate(deviceNamePem, certDevice);
             var deviceClient = DeviceClient.Create(iotHubUrl, auth, transportType);
 
             if (deviceClient == null)
