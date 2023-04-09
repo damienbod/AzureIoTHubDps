@@ -107,18 +107,6 @@ public class DpsEnrollmentGroupProvider
         return (newItem.Name, newItem.Id);
     }
 
-    public async Task EnumerateRegistrationsInGroup(QuerySpecification querySpecification, EnrollmentGroup group)
-    {
-        _logger.LogInformation("Creating a query for registrations within group '{groupEnrollmentGroupId}'...", group.EnrollmentGroupId);
-        
-        using (Query registrationQuery = _provisioningServiceClient.CreateEnrollmentGroupRegistrationStateQuery(querySpecification, group.EnrollmentGroupId))
-        {
-            _logger.LogInformation("Querying the next registrations within group '{groupEnrollmentGroupId}'...", group.EnrollmentGroupId);
-            QueryResult registrationQueryResult = await registrationQuery.NextAsync();
-            _logger.LogInformation("{registrationQueryResult}", registrationQueryResult);
-        }
-    }
-
     public async Task<List<DpsEnrollmentGroup>> GetDpsGroupsAsync(int? certificateId = null)
     {
         if (certificateId == null)
