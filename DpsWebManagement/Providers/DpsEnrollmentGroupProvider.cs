@@ -44,7 +44,7 @@ public class DpsEnrollmentGroupProvider
             .FirstOrDefault(t => t.Id == int.Parse(certificatePublicPemId));
 
         var rootCertificate = X509Certificate2.CreateFromPem(
-               dpsCertificate!.PemPublicKey,dpsCertificate.PemPrivateKey);
+               dpsCertificate!.PemPublicKey, dpsCertificate.PemPrivateKey);
 
         // create an intermediate for each group
         var certName = $"{enrollmentGroupName}";
@@ -64,7 +64,45 @@ public class DpsEnrollmentGroupProvider
         }
 
         Attestation attestation = X509Attestation.CreateFromRootCertificates(pemDpsGroupPublic);
-        var enrollmentGroup = new EnrollmentGroup(enrollmentGroupName, attestation)
+        EnrollmentGroup enrollmentGroup = CreateEnrollmentGroup(enrollmentGroupName, attestation);
+
+        _logger.LogInformation("{enrollmentGroup}", enrollmentGroup);
+        _logger.LogInformation("Adding new enrollmentGroup...");
+
+        EnrollmentGroup enrollmentGroupResult = await _provisioningServiceClient
+            .CreateOrUpdateEnrollmentGroupAsync(enrollmentGroup);
+
+        _logger.LogInformation("EnrollmentGroup created with success.");
+        _logger.LogInformation("{enrollmentGroupResult}", enrollmentGroupResult);
+
+        DpsEnrollmentGroup newItem = await PersistData(enrollmentGroupName, 
+            dpsCertificate, pemDpsGroupPublic, pemDpsGroupPrivate);
+
+        return (newItem.Name, newItem.Id);
+    }
+
+    private async Task<DpsEnrollmentGroup> PersistData(string enrollmentGroupName, 
+        DpsCertificate dpsCertificate, string pemDpsGroupPublic, string pemDpsGroupPrivate)
+    {
+        var newItem = new DpsEnrollmentGroup
+        {
+            DpsCertificateId = dpsCertificate.Id,
+            Name = enrollmentGroupName,
+            DpsCertificate = dpsCertificate,
+            PemPublicKey = pemDpsGroupPublic,
+            PemPrivateKey = pemDpsGroupPrivate
+        };
+
+        _dpsDbContext.DpsEnrollmentGroups.Add(newItem);
+        dpsCertificate.DpsEnrollmentGroups.Add(newItem);
+
+        await _dpsDbContext.SaveChangesAsync();
+        return newItem;
+    }
+
+    private static EnrollmentGroup CreateEnrollmentGroup(string enrollmentGroupName, Attestation attestation)
+    {
+        return new EnrollmentGroup(enrollmentGroupName, attestation)
         {
             ProvisioningStatus = ProvisioningStatus.Enabled,
             ReprovisionPolicy = new ReprovisionPolicy
@@ -81,30 +119,6 @@ public class DpsEnrollmentGroupProvider
                 new TwinCollection("{ }")
             )
         };
-        _logger.LogInformation("{enrollmentGroup}", enrollmentGroup);
-        _logger.LogInformation("Adding new enrollmentGroup...");
-
-        EnrollmentGroup enrollmentGroupResult = await _provisioningServiceClient
-            .CreateOrUpdateEnrollmentGroupAsync(enrollmentGroup);
-
-        _logger.LogInformation("EnrollmentGroup created with success.");
-        _logger.LogInformation("{enrollmentGroupResult}", enrollmentGroupResult);
-
-        var newItem = new DpsEnrollmentGroup
-        {
-            DpsCertificateId = dpsCertificate.Id,
-            Name = enrollmentGroupName, 
-            DpsCertificate = dpsCertificate,
-            PemPublicKey = pemDpsGroupPublic,
-            PemPrivateKey = pemDpsGroupPrivate
-        };
-        _dpsDbContext.DpsEnrollmentGroups.Add(newItem);
-
-        dpsCertificate.DpsEnrollmentGroups.Add(newItem);
-
-        await _dpsDbContext.SaveChangesAsync();
-
-        return (newItem.Name, newItem.Id);
     }
 
     public async Task<List<DpsEnrollmentGroup>> GetDpsGroupsAsync(int? certificateId = null)
