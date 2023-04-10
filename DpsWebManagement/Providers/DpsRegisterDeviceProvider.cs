@@ -36,8 +36,6 @@ public class DpsRegisterDeviceProvider
     {
         int? deviceId = null;
         var scopeId = Configuration["ScopeId"];
-        string? password = GetEncodedRandomString(30);
-        deviceCommonNameDevice = deviceCommonNameDevice.ToLower();
 
         var dpsEnrollmentGroup = _dpsDbContext.DpsEnrollmentGroups
            .FirstOrDefault(t => t.Id == int.Parse(dpsEnrollmentGroupId));
@@ -45,30 +43,38 @@ public class DpsRegisterDeviceProvider
         var certDpsEnrollmentGroup = X509Certificate2.CreateFromPem(
             dpsEnrollmentGroup!.PemPublicKey, dpsEnrollmentGroup.PemPrivateKey);
 
-        var certDevice = _createCertsService.NewDeviceChainedCertificate(
-          new DistinguishedName { CommonName = $"{deviceCommonNameDevice}" },
-          new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
-          $"{deviceCommonNameDevice}", certDpsEnrollmentGroup);
+        var newDevice = new DpsEnrollmentDevice
+        {
+            Password = GetEncodedRandomString(30),
+            Name = deviceCommonNameDevice.ToLower(),
+            DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
+            DpsEnrollmentGroup = dpsEnrollmentGroup
+        };
 
-        var deviceInPfxBytes = _iec.ExportChainedCertificatePfx(password, certDevice, certDpsEnrollmentGroup);
+        var certDevice = _createCertsService.NewDeviceChainedCertificate(
+          new DistinguishedName { CommonName = $"{newDevice.Name}" },
+          new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
+          $"{newDevice.Name}", certDpsEnrollmentGroup);
+
+        var deviceInPfxBytes = _iec.ExportChainedCertificatePfx(newDevice.Password, 
+            certDevice, certDpsEnrollmentGroup);
 
         // This is required if you want PFX exports to work.
-        var pfxPath = FileProvider.WritePfxToDisk($"{deviceCommonNameDevice}.pfx", deviceInPfxBytes);
+        newDevice.PathToPfx = FileProvider.WritePfxToDisk($"{newDevice.Name}.pfx", deviceInPfxBytes);
 
         // get the public key certificate for the device
-        var pemDeviceCertPublic = _iec.PemExportPublicKeyCertificate(certDevice);
-        FileProvider.WriteToDisk($"{deviceCommonNameDevice}-public.pem", pemDeviceCertPublic);
+        newDevice.PemPublicKey = _iec.PemExportPublicKeyCertificate(certDevice);
+        FileProvider.WriteToDisk($"{newDevice.Name}-public.pem", newDevice.PemPublicKey);
 
-        string pemDeviceCertPrivateKey = string.Empty;
         using (ECDsa? ecdsa = certDevice.GetECDsaPrivateKey())
         {
-            pemDeviceCertPrivateKey = ecdsa!.ExportECPrivateKeyPem();
-            FileProvider.WriteToDisk($"{deviceCommonNameDevice}-private.pem", pemDeviceCertPrivateKey);
+            newDevice.PemPrivateKey = ecdsa!.ExportECPrivateKeyPem();
+            FileProvider.WriteToDisk($"{newDevice.Name}-private.pem", newDevice.PemPrivateKey);
         }
 
         // setup Windows store deviceCert 
-        var pemExportDevice = _iec.PemExportPfxFullCertificate(certDevice, password);
-        var certDeviceForCreation = _iec.PemImportCertificate(pemExportDevice, password);
+        var pemExportDevice = _iec.PemExportPfxFullCertificate(certDevice, newDevice.Password);
+        var certDeviceForCreation = _iec.PemImportCertificate(pemExportDevice, newDevice.Password);
 
         using (var security = new SecurityProviderX509Certificate(certDeviceForCreation, new X509Certificate2Collection(certDpsEnrollmentGroup)))
 
@@ -93,22 +99,11 @@ public class DpsRegisterDeviceProvider
             }
         }
 
-        var newItem = new DpsEnrollmentDevice
-        {
-            Password = password,
-            PathToPfx = pfxPath,
-            PemPrivateKey = pemDeviceCertPrivateKey,
-            PemPublicKey = pemDeviceCertPublic,
-            Name = deviceCommonNameDevice,
-            DpsEnrollmentGroupId = dpsEnrollmentGroup.Id,
-            DpsEnrollmentGroup = dpsEnrollmentGroup
-        };
-
-        _dpsDbContext.DpsEnrollmentDevices.Add(newItem);
-        dpsEnrollmentGroup.DpsEnrollmentDevices.Add(newItem);
+        _dpsDbContext.DpsEnrollmentDevices.Add(newDevice);
+        dpsEnrollmentGroup.DpsEnrollmentDevices.Add(newDevice);
         await _dpsDbContext.SaveChangesAsync();
 
-        deviceId = newItem.Id;
+        deviceId = newDevice.Id;
         return (deviceId, null);
     }
 
