@@ -4,6 +4,8 @@
 
 [Provisioning X.509 Devices for Azure IoT Hub using .NET Core](https://damienbod.com/2020/02/20/provisioning-x-509-devices-for-azure-iot-hub-using-net-core/)
 
+[Provision Azure IoT Hub devices using DPS and X.509 certificates in ASP.NET Core](https://damienbod.com)
+
 ## User secrets:
 
 You can find the DPS/IoT Hub Connection Strings in the portal:
@@ -29,7 +31,7 @@ Update-Database
 
 ## History
 
-2023-04-08 Add PKI web application for Azure IoT Hub DPS using DPS enrollment groups and certificates
+2023-04-10 Add PKI web application for Azure IoT Hub DPS using DPS enrollment groups and certificates
 
 2023-03-27 Updated to .NET 7, fix group and individual enrollments
 
