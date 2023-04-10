@@ -34,7 +34,6 @@ public class DpsRegisterDeviceProvider
     public async Task<(int? DeviceId, string? ErrorMessage)> RegisterDeviceAsync(
         string deviceCommonNameDevice, string dpsEnrollmentGroupId)
     {
-        int? deviceId = null;
         var scopeId = Configuration["ScopeId"];
 
         var dpsEnrollmentGroup = _dpsDbContext.DpsEnrollmentGroups
@@ -103,8 +102,7 @@ public class DpsRegisterDeviceProvider
         dpsEnrollmentGroup.DpsEnrollmentDevices.Add(newDevice);
         await _dpsDbContext.SaveChangesAsync();
 
-        deviceId = newDevice.Id;
-        return (deviceId, null);
+        return (newDevice.Id, null);
     }
 
     private static string GetEncodedRandomString(int length)
