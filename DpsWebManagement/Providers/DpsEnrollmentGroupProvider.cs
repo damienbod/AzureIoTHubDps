@@ -81,6 +81,14 @@ public class DpsEnrollmentGroupProvider
         return (newItem.Name, newItem.Id);
     }
 
+    public async Task<EnrollmentGroup?> GetAzureEnrollmentGroup(string? enrollmentGroupId)
+    {
+        var groupEnrollment = await _provisioningServiceClient
+            .GetEnrollmentGroupAsync("clean-room");
+
+        return groupEnrollment;
+    }
+
     private async Task<DpsEnrollmentGroup> PersistData(string enrollmentGroupName, 
         DpsCertificate dpsCertificate, string pemDpsGroupPublic, string pemDpsGroupPrivate)
     {

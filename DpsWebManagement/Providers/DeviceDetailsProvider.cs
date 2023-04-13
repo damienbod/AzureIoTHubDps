@@ -13,8 +13,7 @@ public class DeviceDetailsProvider
     private readonly ProvisioningServiceClient _provisioningServiceClient;
 
     public DeviceDetailsProvider(IConfiguration config, 
-        ILoggerFactory loggerFactory,
-        DpsDbContext dpsDbContext)
+        ILoggerFactory loggerFactory, DpsDbContext dpsDbContext)
     {
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsRegisterDeviceProvider>();
@@ -22,6 +21,14 @@ public class DeviceDetailsProvider
 
         _provisioningServiceClient = ProvisioningServiceClient
               .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
+    }
+
+    public async Task<DeviceRegistrationState?> GetAzureDeviceRegistrationState(string? enrollmentGroupId)
+    {
+        var device = await _provisioningServiceClient
+            .GetDeviceRegistrationStateAsync(enrollmentGroupId);
+
+        return device;
     }
 
     public async Task EnableEnrollmentGroupAsync(string enrollmentGroupId)

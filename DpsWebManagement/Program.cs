@@ -25,6 +25,8 @@ public class Program
         builder.Services.AddScoped<DpsEnrollmentGroupProvider>();
         builder.Services.AddScoped<DpsCertificateProvider>();
 
+        builder.Services.AddScoped<DeviceDetailsProvider>();
+
         builder.Services.AddDistributedMemoryCache();
 
         builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)

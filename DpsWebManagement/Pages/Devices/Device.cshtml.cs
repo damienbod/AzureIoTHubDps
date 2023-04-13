@@ -6,18 +6,23 @@ namespace DpsWebManagement.Pages.Devices;
 
 public class DeviceModel : PageModel
 {
-    private readonly DpsRegisterDeviceProvider _dpsRegisterDeviceProvider;
+    private readonly DeviceDetailsProvider _deviceDetailsProvider;
 
-    public DpsDeviceData DpsDevice = new DpsDeviceData();
-    public DeviceModel(DpsRegisterDeviceProvider dpsRegisterDeviceProvider)
+    public DpsDeviceData DpsDevice = new();
+
+    public DeviceModel(DeviceDetailsProvider deviceDetailsProvider)
     {
-        _dpsRegisterDeviceProvider = dpsRegisterDeviceProvider;
+        _deviceDetailsProvider = deviceDetailsProvider;
     }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var data = await _dpsRegisterDeviceProvider.GetDpsDeviceAsync(id);
-        if(data == null)
+        var data = await _deviceDetailsProvider.GetDpsDeviceAsync(id);
+
+        var azureData = await _deviceDetailsProvider
+            .GetAzureDeviceRegistrationState(data!.DeviceId);
+
+        if (data == null)
         {
             return NotFound();
         }
