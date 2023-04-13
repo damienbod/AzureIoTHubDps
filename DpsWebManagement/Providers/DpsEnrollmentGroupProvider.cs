@@ -84,7 +84,7 @@ public class DpsEnrollmentGroupProvider
     public async Task<EnrollmentGroup?> GetAzureEnrollmentGroup(string? enrollmentGroupId)
     {
         var groupEnrollment = await _provisioningServiceClient
-            .GetEnrollmentGroupAsync("clean-room");
+            .GetEnrollmentGroupAsync(enrollmentGroupId);
 
         return groupEnrollment;
     }

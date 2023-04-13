@@ -23,10 +23,10 @@ public class DeviceDetailsProvider
               .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
     }
 
-    public async Task<DeviceRegistrationState?> GetAzureDeviceRegistrationState(string? enrollmentGroupId)
+    public async Task<DeviceRegistrationState?> GetAzureDeviceRegistrationState(string? deviceId)
     {
         var device = await _provisioningServiceClient
-            .GetDeviceRegistrationStateAsync(enrollmentGroupId);
+            .GetDeviceRegistrationStateAsync(deviceId);
 
         return device;
     }
