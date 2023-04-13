@@ -27,7 +27,10 @@ public class DeviceModel : PageModel
             Id = data.Id,
             Name = data.Name,
             Password = data.Password,
-            DpsEnrollmentGroup = data.DpsEnrollmentGroup.Name
+            DpsEnrollmentGroup = data.DpsEnrollmentGroup.Name,
+            AssignedHub = data.AssignedHub,
+            RegistrationId = data.RegistrationId,
+            DeviceId = data.DeviceId
         };
         return Page();
     }
@@ -42,4 +45,8 @@ public class DpsDeviceData
     public string? Password { get; set; }  
 
     public string? DpsEnrollmentGroup { get; set; }
+
+    public string? AssignedHub { get; set; }
+    public string? DeviceId { get; set; }
+    public string? RegistrationId { get; set; }
 }

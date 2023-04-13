@@ -49,6 +49,39 @@
         <hr />
 
         <div class="row">
+            <div class="col-sm-4">
+                DeviceId
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.DeviceId)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                AssignedHub
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.AssignedHub)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                RegistrationId
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.RegistrationId)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
             <div class="col-sm-12">
                 <form action="/api/FileDownload/DpsDevicePfx" method="post">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
