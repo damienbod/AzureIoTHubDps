@@ -16,6 +16,10 @@ public class DpsEnrollmentDevice
     // This should be encrypted or not saved all all here! 
     public string? Password { get; set; }
 
+    public string? AssignedHub { get; set; }
+    public string? DeviceId { get; set; }
+    public string? RegistrationId { get; set; }
+
     public int DpsEnrollmentGroupId { get; set; }
 
     public DpsEnrollmentGroup DpsEnrollmentGroup { get; set; } = new();

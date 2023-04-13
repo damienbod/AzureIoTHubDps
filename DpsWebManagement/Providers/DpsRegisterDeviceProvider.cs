@@ -89,6 +89,11 @@ public class DpsRegisterDeviceProvider
             try
             {
                 var result = await client.RegisterAsync();
+
+                newDevice.AssignedHub = result.AssignedHub;
+                newDevice.DeviceId = result.DeviceId;
+                newDevice.RegistrationId = result.RegistrationId;
+
                 _logger.LogInformation("DPS client created: {result}", result);
             }
             catch (Exception ex)
