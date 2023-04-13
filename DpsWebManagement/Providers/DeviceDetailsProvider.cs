@@ -1,4 +1,5 @@
 ﻿using DpsWebManagement.Providers.Model;
+using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ public class DeviceDetailsProvider
     private readonly DpsDbContext _dpsDbContext;
 
     private readonly ProvisioningServiceClient _provisioningServiceClient;
+    private readonly RegistryManager _registryManager;
 
     public DeviceDetailsProvider(IConfiguration config, 
         ILoggerFactory loggerFactory, DpsDbContext dpsDbContext)
@@ -21,6 +23,9 @@ public class DeviceDetailsProvider
 
         _provisioningServiceClient = ProvisioningServiceClient
               .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
+
+        _registryManager = RegistryManager.CreateFromConnectionString(
+            Configuration.GetConnectionString("IoTHubConnection"));
     }
 
     public async Task<DeviceRegistrationState?> GetAzureDeviceRegistrationState(string? deviceId)
@@ -31,38 +36,35 @@ public class DeviceDetailsProvider
         return device;
     }
 
-    public async Task EnableEnrollmentGroupAsync(string enrollmentGroupId)
+    public async Task DisableDeviceAsync(string deviceId)
     {
-        QuerySpecification querySpecification = new QuerySpecification("SELECT * FROM enrollments"); // WHERE does not work here..., can only do a select ALL
-        var groupEnrollments = await _provisioningServiceClient.CreateEnrollmentGroupQuery(querySpecification).NextAsync();
-
-        foreach (var devicestring in groupEnrollments.Items)
-        {
-            var enrollment = devicestring as EnrollmentGroup;
-            if (enrollment != null && enrollment.EnrollmentGroupId == enrollmentGroupId)
-            {
-                if (enrollment.ProvisioningStatus != null &&
-                    enrollment.ProvisioningStatus.Value != ProvisioningStatus.Enabled)
-                {
-                    enrollment.ProvisioningStatus = ProvisioningStatus.Enabled;
-                    var update = await _provisioningServiceClient.CreateOrUpdateEnrollmentGroupAsync(enrollment);
-                    _logger.LogInformation("EnableEnrollmentGroupAsync update.ProvisioningStatus: ", update.ProvisioningStatus);
-                }
-            }
-        }
+        var device = await _registryManager.GetDeviceAsync(deviceId);
+        device.Status = DeviceStatus.Disabled;
+        device = await _registryManager.UpdateDeviceAsync(device);
+        _logger.LogInformation("iot hub device disabled  {device}", device);
     }
 
-    public async Task DisableEnrollmentGroupAsync(string enrollmentGroupId)
+    public async Task EnableDeviceAsync(string deviceId)
     {
-        var groupEnrollment = await _provisioningServiceClient.GetEnrollmentGroupAsync(enrollmentGroupId);
+        var device = await _registryManager.GetDeviceAsync(deviceId);
+        device.Status = DeviceStatus.Enabled;
+        device = await _registryManager.UpdateDeviceAsync(device);
+        _logger.LogInformation("iot hub device enabled  {device}", device);
+    }
 
-        if (groupEnrollment != null && groupEnrollment.ProvisioningStatus != null
-            && groupEnrollment.ProvisioningStatus.Value != ProvisioningStatus.Disabled)
+    public async Task UpdateAuthDeviceCertificateAuthorityAsync(string deviceId, string thumbprint)
+    {
+        var device = await _registryManager.GetDeviceAsync(deviceId);
+        device.Authentication = new AuthenticationMechanism
         {
-            groupEnrollment.ProvisioningStatus = ProvisioningStatus.Disabled;
-            var update = await _provisioningServiceClient.CreateOrUpdateEnrollmentGroupAsync(groupEnrollment);
-            _logger.LogInformation("DisableEnrollmentGroupAsync update.ProvisioningStatus: ", update.ProvisioningStatus);
-        }
+            X509Thumbprint = new X509Thumbprint
+            {
+                PrimaryThumbprint = thumbprint
+            },
+            Type = AuthenticationType.CertificateAuthority
+        };
+        device = await _registryManager.UpdateDeviceAsync(device);
+        _logger.LogInformation("iot hub device updated  {device}", device);
     }
 
     public async Task<DpsEnrollmentDevice?> GetDpsDeviceAsync(int id)
