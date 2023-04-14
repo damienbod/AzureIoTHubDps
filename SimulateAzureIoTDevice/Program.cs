@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using CertificateManager;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.Azure.Devices.Shared;
 
 namespace SimulateAzureIoTDevice;
 
@@ -33,7 +34,7 @@ class Program
 
             #region pem
 
-            var deviceNamePem = "robot1-feed";
+            var deviceNamePem = "final-measurement";
 
             var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
@@ -61,6 +62,10 @@ class Program
             else
             {
                 Console.WriteLine("Successfully created DeviceClient!");
+
+                deviceClient.UpdateReportedPropertiesAsync(
+                    new TwinCollection("{ \"updatedby\":\"" + "simiDam" + "\", \"timeZone\":\"" + TimeZoneInfo.Local.DisplayName + "\" }")
+                );
                 SendEvent(deviceClient).Wait();
             }
 
