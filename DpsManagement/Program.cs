@@ -48,11 +48,11 @@ class Program
         var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}dpsCa.pem");
         var dpsCaCertificate = new X509Certificate2($"{_pathToCerts}dpsCa.pfx", "1234");
 
-        var commonNameAndGroupEnrollmentName = "enrollment-group";
-        await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsEnrollmentPem);
+        var commonNameAndGroupEnrollmentName = "enrollment-group3";
+        var groupCert = await CreateEnrollmentGroup(commonNameAndGroupEnrollmentName, dpsCaCertificate);
 
-        await CreateGroupEnrollmentDeviceAsync("enrollment-group-device-01", dpsCaCertificate, "1234");
-        await CreateGroupEnrollmentDeviceAsync("enrollment-group-device-02", dpsCaCertificate, "1234");
+        await CreateGroupEnrollmentDeviceAsync("enrollment-group3-device-01", groupCert, "1234");
+        await CreateGroupEnrollmentDeviceAsync("enrollment-group3-device-02", groupCert, "1234");
 
         await dpsEnrollmentGroupService.QueryEnrollmentGroupAsync();
 
@@ -89,7 +89,7 @@ class Program
         return result;
     }
 
-    private static async Task CreateEnrollmentGroup(string enrollmentGroup, X509Certificate2 groupCertificate)
+    private static async Task<X509Certificate2> CreateEnrollmentGroup(string enrollmentGroup, X509Certificate2 groupCertificate)
     {
         if (_sp == null) throw new ArgumentNullException(nameof(_sp));
 
@@ -101,8 +101,23 @@ class Program
         if (dpsEnrollmentGroup == null) throw new ArgumentNullException(nameof(dpsEnrollmentGroup));
         if (iec == null) throw new ArgumentNullException(nameof(iec));
 
+        // create an intermediate for each group
+        var certName = $"enrollmentGroup";
+        var dpsIntermediateGroup = cc.NewIntermediateChainedCertificate(
+            new DistinguishedName { CommonName = certName, Country = "CH" },
+            new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
+            2, certName, groupCertificate);
+        dpsIntermediateGroup.FriendlyName = $"{certName} certificate";
+
+        // get the public key certificate for the enrollment
+        var dpsIntermediateGroupPem = iec.PemExportPublicKeyCertificate(dpsIntermediateGroup);
+        var dpsIntermediateGroupPublic = iec.PemImportCertificate(dpsIntermediateGroupPem);
+
+        // use public key only certificate
         await dpsEnrollmentGroup.CreateDpsEnrollmentGroupAsync(
-            enrollmentGroup, new X509Certificate2(groupCertificate));
+            enrollmentGroup, new X509Certificate2(dpsIntermediateGroupPublic));
+
+        return dpsIntermediateGroup;
     }
 
     private static async Task<X509Certificate2> CreateGroupEnrollmentDeviceAsync(

@@ -1,0 +1,80 @@
+﻿@page
+@model DpsWebManagement.Pages.Devices.DeviceModel
+@{
+    ViewData["Title"] = "Azure IoT Hub Device details";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm-4">
+                DPS Device ID
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.Id)
+            </div>
+        </div>
+
+        <hr />
+        <div class="row">
+            <div class="col-sm-4">
+                Device Name
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.Name)
+            </div>
+        </div>
+
+        <hr />
+        <div class="row">
+            <div class="col-sm-4">
+                Device DpsEnrollmentGroup
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.DpsEnrollmentGroup)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                Password (Only required for PFX)
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.Password)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-12">
+                <form action="/api/FileDownload/DpsDevicePfx" method="post">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <button type="submit" style="padding-left:0" class="btn btn-link">Download PFX</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <form action="/api/FileDownload/DpsDevicePrivateKeyPem" method="post">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <button type="submit" style="padding-left:0" class="btn btn-link">Download Private Key PEM</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <form action="/api/FileDownload/DpsDevicePublicKeyPem" method="post">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <button type="submit" style="padding-left:0" class="btn btn-link">Download Public PEM</button>
+                </form>
+            </div>
+        </div>
+       
+
+    </div>
+</div>

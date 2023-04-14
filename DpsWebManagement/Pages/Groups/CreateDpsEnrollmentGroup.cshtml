@@ -1,0 +1,22 @@
+﻿@page
+@model DpsWebManagement.Pages.Groups.CreateDpsEnrollmentGroupModel
+@{
+    ViewData["Title"] = "Azure IoT Hub Create DPS Enrollment Group";
+}
+
+<form asp-page="CreateDpsCertificateModel" method="post">
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Group Name:</label>
+        <input class="form-control" type="text" value="@Model.Name" id="Name" name="Name" />
+        <span asp-validation-for="Name" style="color:red"></span>
+    </div>
+
+    <div class="mb-3">
+        <label for="DpsCertificates">DPS Certificate</label>
+        @Html.DropDownList("DpsCertificate", Model.DpsCertificates, new { @class = "form-control" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create DPS enrollment group from certificate</button>
+</form>
+
+<br />

@@ -1,0 +1,32 @@
+﻿@page
+@model DpsWebManagement.Pages.Devices.CreateDpsEnrollmentGroupDeviceModel
+@{
+    ViewData["Title"] = "Azure IoT Hub Create Device";
+}
+
+<form asp-page="CreateDpsEnrollmentGroupDeviceModel" method="post">
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Device Name:</label>
+        <input class="form-control" type="text" value="@Model.Name" id="Name" name="Name" />
+        <span asp-validation-for="Name" style="color:red"></span>
+    </div>
+
+    <div class="mb-3">
+        <label for="DpsCertificates">DPS Group</label>
+        @Html.DropDownList("DpsEnrollmentGroup", Model.DpsEnrollmentGroups, new { @class = "form-control" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create DPS device from group</button>
+</form>
+
+<br />
+
+@if (Model.DeviceId != null)
+{
+    <a asp-page="../Devices/Device" asp-route-id="@Model.DeviceId">Device details and download</a>
+}
+
+@if (Model.Message != null)
+{
+    <textarea class="form-control" rows="5" id="Message" name="Message" readonly>@Model.Message</textarea>
+}

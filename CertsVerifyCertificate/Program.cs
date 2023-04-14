@@ -28,7 +28,7 @@ class Program
 
         var verify = createClientServerAuthCerts.NewDeviceVerificationCertificate(
         "5FF0630C6EE1BADB9D1C783271051D3963B896B1C5753A9C", root);
-        verify.FriendlyName = "verify";
+        //verify.FriendlyName = "verify";
 
         var verifyPEM = importExportCertificate.PemExportPublicKeyCertificate(verify);
         File.WriteAllText("verify.pem", verifyPEM);

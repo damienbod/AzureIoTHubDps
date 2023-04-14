@@ -1,0 +1,31 @@
+﻿@page
+@model DpsWebManagement.Pages.DpsCerts.CreateDpsCertificateModel
+@{
+    ViewData["Title"] = "Azure IoT Hub Create DPS Certificate";
+}
+
+<form asp-page="CreateDpsCertificateModel" method="post">
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Certificate Name:</label>
+        <input class="form-control" type="text" value="@Model.Name" id="Name" name="Name"/>
+        <span asp-validation-for="Name" style="color:red"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create DPS certificate</button>
+</form>
+
+<br />
+
+<p>The certificate can be uploaded to the Azure IoT Hub Device Provisioning Services</p>
+
+@if (Model.Id != null)
+{
+    <form action="/api/FileDownload/DpsCertificatePem" method="post">
+        <input type="hidden" value="@Model.Id" id="Id" name="Id" />
+        <button type="submit" class="btn btn-link">download</button>
+    </form> 
+
+    <textarea class="form-control" rows="5" id="Message" name="Message" readonly>@Model.Message</textarea>
+}
+
+<img src="~/dps-setup-cert-o1.png" width="400px"/>

@@ -1,0 +1,44 @@
+﻿@page
+@model DpsWebManagement.Pages.Devices.DpsEnrollmentGroupDevicesModel
+@{
+    ViewData["Title"] = "Azure IoT Hub Devices";
+}
+
+<p>
+    <a asp-page="CreateDpsEnrollmentGroupDevice">Create new device</a>
+</p>
+<table class="table">
+    <thead class="thead-light">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DpsDevices[0].Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DpsDevices[0].Name)
+            </th>
+            <th>
+                DPS enrollment group
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.DpsDevices)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DpsEnrollmentGroup)
+                </td>
+                <td>
+                    <a asp-page="../Devices/Device" asp-route-id="@item.Id">details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
