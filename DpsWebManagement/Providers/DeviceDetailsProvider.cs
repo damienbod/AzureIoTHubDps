@@ -12,7 +12,6 @@ public class DeviceDetailsProvider
     private readonly DpsDbContext _dpsDbContext;
 
     private readonly ProvisioningServiceClient _provisioningServiceClient;
-    private readonly RegistryManager _registryManager;
 
     public DeviceDetailsProvider(IConfiguration config, 
         ILoggerFactory loggerFactory, DpsDbContext dpsDbContext)
@@ -23,12 +22,9 @@ public class DeviceDetailsProvider
 
         _provisioningServiceClient = ProvisioningServiceClient
               .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
-
-        _registryManager = RegistryManager.CreateFromConnectionString(
-            Configuration.GetConnectionString("IoTHubConnection"));
     }
 
-    public async Task<DeviceRegistrationState?> GetAzureDeviceRegistrationState(string? deviceId)
+    public async Task<DeviceRegistrationState?> GetAzureDpsDeviceRegistrationState(string? deviceId)
     {
         var device = await _provisioningServiceClient
             .GetDeviceRegistrationStateAsync(deviceId);
@@ -36,25 +32,46 @@ public class DeviceDetailsProvider
         return device;
     }
 
-    public async Task DisableDeviceAsync(string deviceId)
+    public async Task<Device?> GetAzureIoTDevice(string? deviceId, string assignedIotHub)
     {
-        var device = await _registryManager.GetDeviceAsync(deviceId);
+        var registryManager = RegistryManager.CreateFromConnectionString(
+          Configuration.GetConnectionString(assignedIotHub));
+
+        var device = await registryManager.GetDeviceAsync(deviceId);
+
+        return device;
+    }
+
+    public async Task DisableIoTDeviceAsync(string deviceId, string assignedIotHub)
+    {
+        var registryManager = RegistryManager.CreateFromConnectionString(
+          Configuration.GetConnectionString(assignedIotHub));
+
+        var device = await registryManager.GetDeviceAsync(deviceId);
         device.Status = DeviceStatus.Disabled;
-        device = await _registryManager.UpdateDeviceAsync(device);
+        device = await registryManager.UpdateDeviceAsync(device);
+
         _logger.LogInformation("iot hub device disabled  {device}", device);
     }
 
-    public async Task EnableDeviceAsync(string deviceId)
+    public async Task EnableDeviceAsync(string deviceId, string assignedIotHub)
     {
-        var device = await _registryManager.GetDeviceAsync(deviceId);
+        var registryManager = RegistryManager.CreateFromConnectionString(
+          Configuration.GetConnectionString(assignedIotHub));
+
+        var device = await registryManager.GetDeviceAsync(deviceId);
         device.Status = DeviceStatus.Enabled;
-        device = await _registryManager.UpdateDeviceAsync(device);
+        device = await registryManager.UpdateDeviceAsync(device);
         _logger.LogInformation("iot hub device enabled  {device}", device);
     }
 
-    public async Task UpdateAuthDeviceCertificateAuthorityAsync(string deviceId, string thumbprint)
+    public async Task UpdateAuthDeviceCertificateAuthorityAsync(string deviceId, 
+        string thumbprint, string assignedIotHub)
     {
-        var device = await _registryManager.GetDeviceAsync(deviceId);
+        var registryManager = RegistryManager.CreateFromConnectionString(
+          Configuration.GetConnectionString(assignedIotHub));
+
+        var device = await registryManager.GetDeviceAsync(deviceId);
         device.Authentication = new AuthenticationMechanism
         {
             X509Thumbprint = new X509Thumbprint
@@ -63,11 +80,12 @@ public class DeviceDetailsProvider
             },
             Type = AuthenticationType.CertificateAuthority
         };
-        device = await _registryManager.UpdateDeviceAsync(device);
+        device = await registryManager.UpdateDeviceAsync(device);
+
         _logger.LogInformation("iot hub device updated  {device}", device);
     }
 
-    public async Task<DpsEnrollmentDevice?> GetDpsDeviceAsync(int id)
+    public async Task<DpsEnrollmentDevice?> GetDpsDeviceFromDbAsync(int id)
     {
         return await _dpsDbContext.DpsEnrollmentDevices
             .Include(device => device.DpsEnrollmentGroup)

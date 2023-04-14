@@ -1,12 +1,16 @@
 using DpsWebManagement.Providers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Azure.Devices;
 
 namespace DpsWebManagement.Pages.Devices;
 
 public class DeviceModel : PageModel
 {
     private readonly DeviceDetailsProvider _deviceDetailsProvider;
+
+    [BindProperty]
+    public int? Id { get; set; }
 
     public DpsDeviceData DpsDevice = new();
 
@@ -17,10 +21,10 @@ public class DeviceModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var data = await _deviceDetailsProvider.GetDpsDeviceAsync(id);
+        var data = await _deviceDetailsProvider.GetDpsDeviceFromDbAsync(id);
 
-        var azureData = await _deviceDetailsProvider
-            .GetAzureDeviceRegistrationState(data!.DeviceId);
+        var azureIotDevice = await _deviceDetailsProvider
+            .GetAzureIoTDevice(data!.DeviceId, data.AssignedHub!);
 
         if (data == null)
         {
@@ -35,7 +39,8 @@ public class DeviceModel : PageModel
             DpsEnrollmentGroup = data.DpsEnrollmentGroup.Name,
             AssignedHub = data.AssignedHub,
             RegistrationId = data.RegistrationId,
-            DeviceId = data.DeviceId
+            DeviceId = data.DeviceId,
+            Enabled = (azureIotDevice!.Status == DeviceStatus.Enabled)
         };
         return Page();
     }
@@ -54,4 +59,5 @@ public class DpsDeviceData
     public string? AssignedHub { get; set; }
     public string? DeviceId { get; set; }
     public string? RegistrationId { get; set; }
+    public bool Enabled { get; set; }
 }
