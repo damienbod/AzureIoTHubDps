@@ -1,4 +1,5 @@
 using DpsWebManagement.Providers;
+using DpsWebManagement.Providers.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Azure.Devices;
@@ -8,6 +9,15 @@ namespace DpsWebManagement.Pages.Devices;
 public class DeviceModel : PageModel
 {
     private readonly DeviceDetailsProvider _deviceDetailsProvider;
+
+    [BindProperty]
+    public int? Id { get; set; }
+
+    [BindProperty]
+    public string? DeviceId { get; set; }
+
+    [BindProperty]
+    public string? AssignedHub { get; set; }
 
     public DpsDeviceData DpsDevice = new();
 
@@ -25,9 +35,16 @@ public class DeviceModel : PageModel
             return NotFound();
         }
 
+        await InitializeModel(data);
+
+        return Page();
+    }
+
+    private async Task InitializeModel(DpsEnrollmentDevice? data)
+    {
         DpsDevice = new DpsDeviceData
         {
-            Id = data.Id,
+            Id = data!.Id,
             Name = data.Name,
             Password = data.Password,
             DpsEnrollmentGroup = data.DpsEnrollmentGroup.Name,
@@ -36,6 +53,10 @@ public class DeviceModel : PageModel
             DeviceId = data.DeviceId
         };
 
+        DeviceId = data.DeviceId;
+        AssignedHub = data.AssignedHub;
+        Id = data.Id;
+
         if (data.AssignedHub != null)
         {
             var azureIotDevice = await _deviceDetailsProvider
@@ -43,34 +64,40 @@ public class DeviceModel : PageModel
 
             DpsDevice.Enabled = (azureIotDevice!.Status == DeviceStatus.Enabled);
         }
-
-        return Page();
     }
 
     public async Task<IActionResult> OnPostDisableAsync()
     {
         if (!ModelState.IsValid)
         {
+            var data = await _deviceDetailsProvider.GetDpsDeviceFromDbAsync(Id!.Value);
+            await InitializeModel(data);
             return Page();
         }
 
         var result = await _deviceDetailsProvider
-            .DisableIoTDeviceAsync(DpsDevice.DeviceId, DpsDevice.AssignedHub);
+            .DisableIoTDeviceAsync(DeviceId, AssignedHub);
 
-        return Redirect($"/{DpsDevice.Id}");
+        var newData = await _deviceDetailsProvider.GetDpsDeviceFromDbAsync(Id!.Value);
+        await InitializeModel(newData);
+        return Page();
     }
 
     public async Task<IActionResult> OnPostEnableAsync()
     {
         if (!ModelState.IsValid)
         {
+            var data = await _deviceDetailsProvider.GetDpsDeviceFromDbAsync(Id!.Value);
+            await InitializeModel(data);
             return Page();
         }
 
         var result = await _deviceDetailsProvider
-            .DisableIoTDeviceAsync(DpsDevice.DeviceId, DpsDevice.AssignedHub);
+            .EnableIoTDeviceAsync(DeviceId, AssignedHub);
 
-        return Redirect($"/{DpsDevice.Id}");
+        var newData = await _deviceDetailsProvider.GetDpsDeviceFromDbAsync(Id!.Value);
+        await InitializeModel(newData);
+        return Page();
     }
 }
 

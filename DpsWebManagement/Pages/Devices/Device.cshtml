@@ -112,15 +112,19 @@
 
         <div class="row">
             <div class="col-sm-4">
-                <form asp-page="DeviceModel" method="post" asp-page-handler="Disable">
+                <form method="post" asp-page-handler="Enable">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <input type="hidden" value="@Model.DpsDevice.DeviceId" id="DeviceId" name="DeviceId" />
+                    <input type="hidden" value="@Model.DpsDevice.AssignedHub" id="AssignedHub" name="AssignedHub" />
                     <button type="submit" class="btn btn-primary" disabled="@(Model.DpsDevice.Enabled ? "disabled" : null)">Enable device</button>
                 </form>
             </div>
    
             <div class="col-sm-8">
-                <form asp-page="DeviceModel" method="post" asp-page-handler="Enable">
+                <form method="post" asp-page-handler="Disable">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <input type="hidden" value="@Model.DpsDevice.DeviceId" id="DeviceId" name="DeviceId" />
+                    <input type="hidden" value="@Model.DpsDevice.AssignedHub" id="AssignedHub" name="AssignedHub" />
                     <button type="submit" class="btn btn-primary" disabled="@(!Model.DpsDevice.Enabled ? "disabled" : null)">Disable device</button>
                 </form>
             </div>
