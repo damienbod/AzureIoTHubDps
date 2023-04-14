@@ -114,14 +114,14 @@
             <div class="col-sm-4">
                 <form asp-page="CreateDpsCertificateModel" method="post">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-                    <button type="submit" class="btn btn-primary">Enable device</button>
+                    <button type="submit" class="btn btn-primary" disabled="@(Model.DpsDevice.Enabled ? "disabled" : null)">Enable device</button>
                 </form>
             </div>
    
             <div class="col-sm-8">
                 <form asp-page="CreateDpsCertificateModel" method="post">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-                    <button type="submit" class="btn btn-primary">Disable device</button>
+                    <button type="submit" class="btn btn-primary" disabled="@(!Model.DpsDevice.Enabled ? "disabled" : null)">Disable device</button>
                 </form>
             </div>
         </div>

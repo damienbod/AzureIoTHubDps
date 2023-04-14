@@ -9,9 +9,6 @@ public class DeviceModel : PageModel
 {
     private readonly DeviceDetailsProvider _deviceDetailsProvider;
 
-    [BindProperty]
-    public int? Id { get; set; }
-
     public DpsDeviceData DpsDevice = new();
 
     public DeviceModel(DeviceDetailsProvider deviceDetailsProvider)
@@ -22,9 +19,6 @@ public class DeviceModel : PageModel
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var data = await _deviceDetailsProvider.GetDpsDeviceFromDbAsync(id);
-
-        var azureIotDevice = await _deviceDetailsProvider
-            .GetAzureIoTDevice(data!.DeviceId, data.AssignedHub!);
 
         if (data == null)
         {
@@ -39,9 +33,17 @@ public class DeviceModel : PageModel
             DpsEnrollmentGroup = data.DpsEnrollmentGroup.Name,
             AssignedHub = data.AssignedHub,
             RegistrationId = data.RegistrationId,
-            DeviceId = data.DeviceId,
-            Enabled = (azureIotDevice!.Status == DeviceStatus.Enabled)
+            DeviceId = data.DeviceId
         };
+
+        if (data.AssignedHub != null)
+        {
+            var azureIotDevice = await _deviceDetailsProvider
+                .GetAzureIoTDevice(data.DeviceId, data.AssignedHub!);
+
+            DpsDevice.Enabled = (azureIotDevice!.Status == DeviceStatus.Enabled);
+        }
+
         return Page();
     }
 }
