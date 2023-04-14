@@ -42,7 +42,7 @@ public class DeviceDetailsProvider
         return device;
     }
 
-    public async Task DisableIoTDeviceAsync(string deviceId, string assignedIotHub)
+    public async Task<Device?> DisableIoTDeviceAsync(string deviceId, string assignedIotHub)
     {
         var registryManager = RegistryManager.CreateFromConnectionString(
           Configuration.GetConnectionString(assignedIotHub));
@@ -52,9 +52,11 @@ public class DeviceDetailsProvider
         device = await registryManager.UpdateDeviceAsync(device);
 
         _logger.LogInformation("iot hub device disabled  {device}", device);
+
+        return device;
     }
 
-    public async Task EnableDeviceAsync(string deviceId, string assignedIotHub)
+    public async Task<Device?> EnableIoTDeviceAsync(string deviceId, string assignedIotHub)
     {
         var registryManager = RegistryManager.CreateFromConnectionString(
           Configuration.GetConnectionString(assignedIotHub));
@@ -63,6 +65,8 @@ public class DeviceDetailsProvider
         device.Status = DeviceStatus.Enabled;
         device = await registryManager.UpdateDeviceAsync(device);
         _logger.LogInformation("iot hub device enabled  {device}", device);
+
+        return device;
     }
 
     public async Task UpdateAuthDeviceCertificateAuthorityAsync(string deviceId, 

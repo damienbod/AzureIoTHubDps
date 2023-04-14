@@ -46,6 +46,32 @@ public class DeviceModel : PageModel
 
         return Page();
     }
+
+    public async Task<IActionResult> OnPostDisableAsync()
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        var result = await _deviceDetailsProvider
+            .DisableIoTDeviceAsync(DpsDevice.DeviceId, DpsDevice.AssignedHub);
+
+        return Redirect($"/{DpsDevice.Id}");
+    }
+
+    public async Task<IActionResult> OnPostEnableAsync()
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        var result = await _deviceDetailsProvider
+            .DisableIoTDeviceAsync(DpsDevice.DeviceId, DpsDevice.AssignedHub);
+
+        return Redirect($"/{DpsDevice.Id}");
+    }
 }
 
 public class DpsDeviceData
