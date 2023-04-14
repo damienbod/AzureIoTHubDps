@@ -116,7 +116,7 @@
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
                     <input type="hidden" value="@Model.DpsDevice.DeviceId" id="DeviceId" name="DeviceId" />
                     <input type="hidden" value="@Model.DpsDevice.AssignedHub" id="AssignedHub" name="AssignedHub" />
-                    <button type="submit" class="btn btn-primary" disabled="@(Model.DpsDevice.Enabled ? "disabled" : null)">Enable device</button>
+                    <button type="submit" class="btn btn-primary" disabled="@(Model.DpsDevice.Enabled ? "disabled" : null)">Enable IoT Hub device</button>
                 </form>
             </div>
    
@@ -125,8 +125,30 @@
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
                     <input type="hidden" value="@Model.DpsDevice.DeviceId" id="DeviceId" name="DeviceId" />
                     <input type="hidden" value="@Model.DpsDevice.AssignedHub" id="AssignedHub" name="AssignedHub" />
-                    <button type="submit" class="btn btn-primary" disabled="@(!Model.DpsDevice.Enabled ? "disabled" : null)">Disable device</button>
+                    <button type="submit" class="btn btn-primary" disabled="@(!Model.DpsDevice.Enabled ? "disabled" : null)">Disable IoT Hub device</button>
                 </form>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                ConnectionState
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.ConnectionState)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                LastActivityTime
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.LastActivityTime)
             </div>
         </div>
 

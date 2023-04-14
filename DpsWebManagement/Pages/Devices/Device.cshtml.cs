@@ -63,6 +63,8 @@ public class DeviceModel : PageModel
                 .GetAzureIoTDevice(data.DeviceId, data.AssignedHub!);
 
             DpsDevice.Enabled = (azureIotDevice!.Status == DeviceStatus.Enabled);
+            DpsDevice.ConnectionState = azureIotDevice.ConnectionState;
+            DpsDevice.LastActivityTime = azureIotDevice.LastActivityTime;
         }
     }
 
@@ -115,4 +117,6 @@ public class DpsDeviceData
     public string? DeviceId { get; set; }
     public string? RegistrationId { get; set; }
     public bool Enabled { get; set; }
+    public DeviceConnectionState ConnectionState { get; set; }
+    public DateTime LastActivityTime { get; internal set; }
 }
