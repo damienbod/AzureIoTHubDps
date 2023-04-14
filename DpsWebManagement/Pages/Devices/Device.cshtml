@@ -82,28 +82,26 @@
         <hr />
 
         <div class="row">
-            <div class="col-sm-12">
-                <form action="/api/FileDownload/DpsDevicePfx" method="post">
-                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-                    <button type="submit" style="padding-left:0" class="btn btn-link">Download PFX</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-12">
+            
+     
+            <div class="col-sm-4">
                 <form action="/api/FileDownload/DpsDevicePrivateKeyPem" method="post">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
                     <button type="submit" style="padding-left:0" class="btn btn-link">Download Private Key PEM</button>
                 </form>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-4">
                 <form action="/api/FileDownload/DpsDevicePublicKeyPem" method="post">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
                     <button type="submit" style="padding-left:0" class="btn btn-link">Download Public PEM</button>
+                </form>
+            </div>
+
+            <div class="col-sm-4">
+                <form action="/api/FileDownload/DpsDevicePfx" method="post">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <button type="submit" style="padding-left:0" class="btn btn-link">Download PFX</button>
                 </form>
             </div>
         </div>
