@@ -12,11 +12,14 @@ You can find the DPS/IoT Hub Connection Strings in the portal:
 - Azure IoT Hub Device Provisioning Service (DPS) | Shared access policies
 - IoT Hub | Shared access policies
 
+Note: multiple Azure IoT Hubs can be linked to any DPS. Due to this, the devices using the specific Hubs use the AssignedHub property of the DPS enrollment to connect. This needs to be set in the secrets or key vault.
+
 ```json
 {
   "ConnectionStrings": {
     "DpsConnection": "--your-connectionstring--",
-    "IoTHubConnection": "--your-connectionstring--"
+    "--AssignedHub-1--": "--your-connectionstring--",
+    "--AssignedHub-2--": "--your-connectionstring--"
   }
 }
 ```

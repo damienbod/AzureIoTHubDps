@@ -2,3 +2,4 @@
 **/obj/
 /.vs
 /DpsManagement/dps.logs
+/DpsWebManagement/DpsWebManagement.csproj.user
