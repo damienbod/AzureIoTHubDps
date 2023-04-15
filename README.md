@@ -42,6 +42,8 @@ Update-Database
 
 ## Links
 
+https://learn.microsoft.com/en-us/azure/iot-hub/
+
 https://github.com/Azure/azure-iot-sdk-csharp
 
 https://github.com/damienbod/AspNetCoreCertificates
