@@ -32,7 +32,7 @@ class Program
             new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
             "testdevice01", intermediate);
         //device.FriendlyName = "IoT device testdevice01";
-  
+
         string password = "1234";
 
         var deviceInPfxBytes = iec.ExportChainedCertificatePfx(password, device, intermediate);

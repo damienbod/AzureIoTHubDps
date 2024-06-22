@@ -21,7 +21,7 @@ public class DpsEnrollmentGroupsModel : PageModel
     public async Task OnGetAsync()
     {
         var data = await _dpsEnrollmentGroup.GetDpsGroupsAsync(Id);
-        DpsEnrollmentGroups =  data.Select(item => new DpsEnrollmentGroupModel
+        DpsEnrollmentGroups = data.Select(item => new DpsEnrollmentGroupModel
         {
             Id = item.Id,
             Name = item.Name,
@@ -36,5 +36,5 @@ public class DpsEnrollmentGroupModel
 
     public string? Name { get; set; }
 
-    public int? DpsCertificate { get; set; }    
+    public int? DpsCertificate { get; set; }
 }

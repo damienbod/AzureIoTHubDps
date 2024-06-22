@@ -49,32 +49,106 @@
         <hr />
 
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-4">
+                DeviceId
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.DeviceId)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                AssignedHub
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.AssignedHub)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                RegistrationId
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.RegistrationId)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            
+     
+            <div class="col-sm-4">
+                <form action="/api/FileDownload/DpsDevicePrivateKeyPem" method="post">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <button type="submit" style="padding-left:0" class="btn btn-link">Download Private Key PEM</button>
+                </form>
+            </div>
+
+            <div class="col-sm-4">
+                <form action="/api/FileDownload/DpsDevicePublicKeyPem" method="post">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <button type="submit" style="padding-left:0" class="btn btn-link">Download Public PEM</button>
+                </form>
+            </div>
+
+            <div class="col-sm-4">
                 <form action="/api/FileDownload/DpsDevicePfx" method="post">
                     <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
                     <button type="submit" style="padding-left:0" class="btn btn-link">Download PFX</button>
                 </form>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-sm-12">
-                <form action="/api/FileDownload/DpsDevicePrivateKeyPem" method="post">
-                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-                    <button type="submit" style="padding-left:0" class="btn btn-link">Download Private Key PEM</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-sm-12">
-                <form action="/api/FileDownload/DpsDevicePublicKeyPem" method="post">
-                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
-                    <button type="submit" style="padding-left:0" class="btn btn-link">Download Public PEM</button>
-                </form>
-            </div>
-        </div>
        
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                <form method="post" asp-page-handler="Enable">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <input type="hidden" value="@Model.DpsDevice.DeviceId" id="DeviceId" name="DeviceId" />
+                    <input type="hidden" value="@Model.DpsDevice.AssignedHub" id="AssignedHub" name="AssignedHub" />
+                    <button type="submit" class="btn btn-primary" disabled="@(Model.DpsDevice.Enabled ? "disabled" : null)">Enable IoT Hub device</button>
+                </form>
+            </div>
+   
+            <div class="col-sm-8">
+                <form method="post" asp-page-handler="Disable">
+                    <input type="hidden" value="@Model.DpsDevice.Id" id="Id" name="Id" />
+                    <input type="hidden" value="@Model.DpsDevice.DeviceId" id="DeviceId" name="DeviceId" />
+                    <input type="hidden" value="@Model.DpsDevice.AssignedHub" id="AssignedHub" name="AssignedHub" />
+                    <button type="submit" class="btn btn-primary" disabled="@(!Model.DpsDevice.Enabled ? "disabled" : null)">Disable IoT Hub device</button>
+                </form>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                ConnectionState
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.ConnectionState)
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-sm-4">
+                LastActivityTime
+            </div>
+            <div class="col-sm-8">
+                @Html.DisplayFor(modelItem => Model.DpsDevice.LastActivityTime)
+            </div>
+        </div>
 
     </div>
 </div>

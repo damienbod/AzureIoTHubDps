@@ -1,9 +1,10 @@
-﻿using Microsoft.Azure.Devices.Client;
-using System.Text;
-using System.Reflection;
+﻿using CertificateManager;
+using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.DependencyInjection;
-using CertificateManager;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace SimulateAzureIoTDevice;
 
@@ -33,7 +34,7 @@ class Program
 
             #region pem
 
-            var deviceNamePem = "robot1-feed";
+            var deviceNamePem = "final-measurement";
 
             var certPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-public.pem");
             var eccPem = File.ReadAllText($"{_pathToCerts}{deviceNamePem}-private.pem");
@@ -61,6 +62,10 @@ class Program
             else
             {
                 Console.WriteLine("Successfully created DeviceClient!");
+
+                deviceClient.UpdateReportedPropertiesAsync(
+                    new TwinCollection("{ \"updatedby\":\"" + "simiDam" + "\", \"timeZone\":\"" + TimeZoneInfo.Local.DisplayName + "\" }")
+                );
                 SendEvent(deviceClient).Wait();
             }
 
@@ -94,7 +99,7 @@ class Program
             catch (Exception ex)
             {
                 Console.WriteLine("Error in SendEventAsync: {0}", ex.Message);
-            } 
+            }
         }
     }
 }

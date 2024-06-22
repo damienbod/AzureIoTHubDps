@@ -12,7 +12,7 @@ public static class FileProvider
 
     public static void WriteToDisk(string name, string pemPayload)
     {
-        if(_writeToDiskActive)
+        if (_writeToDiskActive)
         {
             File.WriteAllText($"{_pathToCerts}{name}", pemPayload);
         }

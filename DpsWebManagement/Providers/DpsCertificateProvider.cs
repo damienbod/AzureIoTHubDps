@@ -37,7 +37,7 @@ public class DpsCertificateProvider
             pemPrivateKey = ecdsa!.ExportECPrivateKeyPem();
             FileProvider.WriteToDisk($"{certName}-private.pem", pemPrivateKey);
         }
- 
+
         var item = new DpsCertificate
         {
             Name = certName,

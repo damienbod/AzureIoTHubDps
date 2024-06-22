@@ -5,14 +5,14 @@ namespace DpsWebManagement.Providers;
 
 public class DpsDbContext : DbContext
 {
-    public DpsDbContext(DbContextOptions<DpsDbContext> options): base(options)
+    public DpsDbContext(DbContextOptions<DpsDbContext> options) : base(options)
     {
     }
 
     public DbSet<DpsEnrollmentDevice> DpsEnrollmentDevices => Set<DpsEnrollmentDevice>();
     public DbSet<Model.DpsEnrollmentGroup> DpsEnrollmentGroups => base.Set<Model.DpsEnrollmentGroup>();
     public DbSet<DpsCertificate> DpsCertificates => Set<DpsCertificate>();
-  
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<DpsEnrollmentDevice>().HasKey(m => m.Id);

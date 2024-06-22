@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.Devices.Provisioning.Client;
-using Microsoft.Azure.Devices.Provisioning.Service;
+﻿using Microsoft.Azure.Devices.Provisioning.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography.X509Certificates;
