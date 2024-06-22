@@ -4,7 +4,7 @@
 
 [Provisioning X.509 Devices for Azure IoT Hub using .NET Core](https://damienbod.com/2020/02/20/provisioning-x-509-devices-for-azure-iot-hub-using-net-core/)
 
-[Provision Azure IoT Hub devices using DPS and X.509 certificates in ASP.NET Core](https://damienbod.com)
+[Provision Azure IoT Hub devices using DPS and X.509 certificates in ASP.NET Core](https://damienbod.com/2023/04/17/provision-azure-iot-hub-devices-using-dps-and-x-509-certificates-in-asp-net-core/)
 
 ## User secrets:
 
