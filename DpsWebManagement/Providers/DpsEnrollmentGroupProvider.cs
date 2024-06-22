@@ -11,14 +11,14 @@ namespace DpsWebManagement.Providers;
 
 public class DpsEnrollmentGroupProvider
 {
-    private IConfiguration Configuration { get;set;}
+    private IConfiguration Configuration { get; set; }
 
     private readonly ILogger<DpsEnrollmentGroupProvider> _logger;
     private readonly DpsDbContext _dpsDbContext;
     private readonly ImportExportCertificate _iec;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
     private readonly ProvisioningServiceClient _provisioningServiceClient;
-    
+
     public DpsEnrollmentGroupProvider(IConfiguration config, ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
         CreateCertificatesClientServerAuth ccs,
@@ -75,7 +75,7 @@ public class DpsEnrollmentGroupProvider
         _logger.LogInformation("EnrollmentGroup created with success.");
         _logger.LogInformation("{enrollmentGroupResult}", enrollmentGroupResult);
 
-        DpsEnrollmentGroup newItem = await PersistData(enrollmentGroupName, 
+        DpsEnrollmentGroup newItem = await PersistData(enrollmentGroupName,
             dpsCertificate, pemDpsGroupPublic, pemDpsGroupPrivate);
 
         return (newItem.Name, newItem.Id);
@@ -123,7 +123,7 @@ public class DpsEnrollmentGroupProvider
         }
     }
 
-    private async Task<DpsEnrollmentGroup> PersistData(string enrollmentGroupName, 
+    private async Task<DpsEnrollmentGroup> PersistData(string enrollmentGroupName,
         DpsCertificate dpsCertificate, string pemDpsGroupPublic, string pemDpsGroupPrivate)
     {
         var newItem = new DpsEnrollmentGroup

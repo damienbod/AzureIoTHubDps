@@ -18,7 +18,7 @@ public class DpsRegisterDeviceProvider
     private readonly ImportExportCertificate _iec;
     private readonly CreateCertificatesClientServerAuth _createCertsService;
 
-    public DpsRegisterDeviceProvider(IConfiguration config, 
+    public DpsRegisterDeviceProvider(IConfiguration config,
         ILoggerFactory loggerFactory,
         ImportExportCertificate importExportCertificate,
         CreateCertificatesClientServerAuth ccs,
@@ -55,7 +55,7 @@ public class DpsRegisterDeviceProvider
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(50) },
           $"{newDevice.Name}", certDpsEnrollmentGroup);
 
-        var deviceInPfxBytes = _iec.ExportChainedCertificatePfx(newDevice.Password, 
+        var deviceInPfxBytes = _iec.ExportChainedCertificatePfx(newDevice.Password,
             certDevice, certDpsEnrollmentGroup);
 
         // This is required if you want PFX exports to work.
@@ -125,7 +125,7 @@ public class DpsRegisterDeviceProvider
 
     public async Task<List<DpsEnrollmentDevice>> GetDpsDevicesAsync(int? dpsEnrollmentGroupId)
     {
-        if(dpsEnrollmentGroupId == null)
+        if (dpsEnrollmentGroupId == null)
         {
             return await _dpsDbContext.DpsEnrollmentDevices.ToListAsync();
         }

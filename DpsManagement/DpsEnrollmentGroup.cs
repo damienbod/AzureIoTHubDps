@@ -8,7 +8,7 @@ namespace DpsManagement;
 
 public class DpsEnrollmentGroup
 {
-    private IConfiguration Configuration { get;set;}
+    private IConfiguration Configuration { get; set; }
 
     private readonly ILogger<DpsEnrollmentGroup> _logger;
     ProvisioningServiceClient _provisioningServiceClient;
@@ -25,7 +25,7 @@ public class DpsEnrollmentGroup
     {
         _logger.LogInformation("Starting CreateDpsEnrollmentGroupAsync...");
         _logger.LogInformation("Creating a new enrollmentGroup...");
-       
+
         Attestation attestation = X509Attestation.CreateFromRootCertificates(pemCertificate);
         EnrollmentGroup enrollmentGroup = new EnrollmentGroup(enrollmentGroupId, attestation)
         {

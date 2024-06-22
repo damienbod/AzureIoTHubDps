@@ -16,15 +16,15 @@ public class DpsUpdateDevice
         Configuration = config;
         _logger = loggerFactory.CreateLogger<DpsUpdateDevice>();
 
-       _provisioningServiceClient = ProvisioningServiceClient
-            .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
+        _provisioningServiceClient = ProvisioningServiceClient
+             .CreateFromConnectionString(Configuration.GetConnectionString("DpsConnection"));
     }
 
     public async Task DisableEnrollmentGroupAsync(string enrollmentGroupId)
     {
         var groupEnrollment = await _provisioningServiceClient.GetEnrollmentGroupAsync(enrollmentGroupId);
 
-        if (groupEnrollment != null && groupEnrollment.ProvisioningStatus != null 
+        if (groupEnrollment != null && groupEnrollment.ProvisioningStatus != null
             && groupEnrollment.ProvisioningStatus.Value != ProvisioningStatus.Disabled)
         {
             groupEnrollment.ProvisioningStatus = ProvisioningStatus.Disabled;

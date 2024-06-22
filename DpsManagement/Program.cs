@@ -28,7 +28,7 @@ class Program
         //var deviceId = "testdevice01";
         //var dpsIndividualEnrollmentService = _sp.GetService<DpsIndividualEnrollment>();
         //if (dpsIndividualEnrollmentService == null) throw new ArgumentNullException(nameof(dpsIndividualEnrollmentService));
-        
+
         //var dpsEnrollmentPem = new X509Certificate2($"{_pathToCerts}{deviceId}.pem");
         //await dpsIndividualEnrollmentService.CreateIndividualEnrollment(deviceId, dpsEnrollmentPem);
 
@@ -140,7 +140,7 @@ class Program
           new ValidityPeriod { ValidFrom = DateTime.UtcNow, ValidTo = DateTime.UtcNow.AddYears(10) },
           $"{commonNameDeviceId}", dpsGroupCertificate);
         device.FriendlyName = $"IoT device {commonNameDeviceId}";
-        
+
         var deviceInPfxBytes = iec.ExportChainedCertificatePfx(password, device, dpsGroupCertificate);
         var deviceCert = new X509Certificate2(deviceInPfxBytes, password);
 

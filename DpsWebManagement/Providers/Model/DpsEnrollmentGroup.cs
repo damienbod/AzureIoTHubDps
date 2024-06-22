@@ -14,5 +14,5 @@ public class DpsEnrollmentGroup
 
     public DpsCertificate DpsCertificate { get; set; } = new();
 
-    public ICollection<DpsEnrollmentDevice> DpsEnrollmentDevices { get; } = new List<DpsEnrollmentDevice>();  
+    public ICollection<DpsEnrollmentDevice> DpsEnrollmentDevices { get; } = new List<DpsEnrollmentDevice>();
 }

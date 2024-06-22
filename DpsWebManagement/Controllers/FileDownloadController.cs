@@ -28,7 +28,7 @@ public class FileDownloadController : Controller
     }
 
     [HttpPost("DpsCertificatePem")]
-    public async Task<IActionResult> DpsCertificatePemAsync([FromForm]int id)
+    public async Task<IActionResult> DpsCertificatePemAsync([FromForm] int id)
     {
         var cert = await _dpsCertificateProvider.GetDpsCertificateAsync(id);
         if (cert == null) throw new ArgumentNullException(nameof(cert));

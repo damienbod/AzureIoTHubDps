@@ -1,8 +1,5 @@
 using DpsWebManagement.Providers;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using static System.Net.Mime.MediaTypeNames;
-using System.Text;
 
 namespace DpsWebManagement.Pages.DpsCerts;
 

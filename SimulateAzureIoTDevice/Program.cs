@@ -1,10 +1,10 @@
-﻿using Microsoft.Azure.Devices.Client;
-using System.Text;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using CertificateManager;
-using System.Security.Cryptography.X509Certificates;
+﻿using CertificateManager;
+using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Shared;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace SimulateAzureIoTDevice;
 
@@ -99,7 +99,7 @@ class Program
             catch (Exception ex)
             {
                 Console.WriteLine("Error in SendEventAsync: {0}", ex.Message);
-            } 
+            }
         }
     }
 }

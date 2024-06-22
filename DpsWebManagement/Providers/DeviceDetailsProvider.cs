@@ -13,7 +13,7 @@ public class DeviceDetailsProvider
 
     private readonly ProvisioningServiceClient _provisioningServiceClient;
 
-    public DeviceDetailsProvider(IConfiguration config, 
+    public DeviceDetailsProvider(IConfiguration config,
         ILoggerFactory loggerFactory, DpsDbContext dpsDbContext)
     {
         Configuration = config;
@@ -69,7 +69,7 @@ public class DeviceDetailsProvider
         return device;
     }
 
-    public async Task UpdateAuthDeviceCertificateAuthorityAsync(string deviceId, 
+    public async Task UpdateAuthDeviceCertificateAuthorityAsync(string deviceId,
         string thumbprint, string assignedIotHub)
     {
         var registryManager = RegistryManager.CreateFromConnectionString(
