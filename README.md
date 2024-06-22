@@ -34,11 +34,10 @@ Update-Database
 
 ## History
 
-2023-04-15 Added support for Azure IoT Hub enable, disable, certificate rotation and multiple linked Azure IoT Hubs
-
-2023-04-10 Add PKI web application for Azure IoT Hub DPS using DPS enrollment groups and certificates
-
-2023-03-27 Updated to .NET 7, fix group and individual enrollments
+- 2024-06-22 Updated packages
+- 2023-04-15 Added support for Azure IoT Hub enable, disable, certificate rotation and multiple linked Azure IoT Hubs
+- 2023-04-10 Add PKI web application for Azure IoT Hub DPS using DPS enrollment groups and certificates
+- 2023-03-27 Updated to .NET 7, fix group and individual enrollments
 
 ## Links
 
